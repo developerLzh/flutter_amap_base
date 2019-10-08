@@ -20,7 +20,7 @@ class AMapController {
   AMapController.withId(int id)
       : _mapChannel = MethodChannel('me.yohom/map$id'),
         _markerClickedEventChannel = EventChannel('me.yohom/marker_clicked$id'),
-        _mapDragEventChannel = EventChannel('me.yohom/map_drag_change');
+        _mapDragEventChannel = EventChannel('me.yohom/map_drag_change$id');
 
   void dispose() {}
 

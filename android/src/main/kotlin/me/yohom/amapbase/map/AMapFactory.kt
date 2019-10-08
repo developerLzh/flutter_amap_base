@@ -106,7 +106,7 @@ class AMapView(context: Context,
 
         // map move event channel
         var dragEventSink: EventChannel.EventSink? = null
-        val mapDragEventChannel = EventChannel(registrar.messenger(), "$mapDragChangeChannelName")
+        val mapDragEventChannel = EventChannel(registrar.messenger(), "$mapDragChangeChannelName$id")
         mapDragEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(p0: Any?, sink: EventChannel.EventSink?) {
                 dragEventSink = sink
