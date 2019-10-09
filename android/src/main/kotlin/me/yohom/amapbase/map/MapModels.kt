@@ -72,7 +72,7 @@ class UnifiedMarkerOptions(
         /// 设置多少帧刷新一次图片资源，Marker动画的间隔时间，值越小动画越快
         private val period: Int,
         /// Marker覆盖物的位置坐标
-        private val position: LatLng,
+        val position: LatLng,
         /// Marker覆盖物的图片旋转角度，从正北开始，逆时针计算
         private val rotateAngle: Float,
         /// Marker覆盖物是否平贴地图
@@ -101,7 +101,7 @@ class UnifiedMarkerOptions(
     constructor(options: MarkerOptions) : this(
             icon = options.icon.toString(),
             icons = options.icons.map { it.toString() },
-            alpha =  options.alpha,
+            alpha = options.alpha,
             anchorU = options.anchorU,
             anchorV = options.anchorV,
             draggable = options.isDraggable,
@@ -122,10 +122,9 @@ class UnifiedMarkerOptions(
             belowMaskLayer = options.isBelowMaskLayer
     )
 
-    fun applyTo(map: AMap) {
-        map.addMarker(toMarkerOption())
-
+    fun applyTo(map: AMap):Marker {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(position).build(), 100))
+        return map.addMarker(toMarkerOption())
     }
 
     fun toMarkerOption(): MarkerOptions = MarkerOptions()
@@ -251,7 +250,26 @@ class UnifiedPolylineOptions(
             isUseTexture = this@UnifiedPolylineOptions.isUseTexture
         })
     }
+}
 
+class UnifiedPolygonOptions(
+        //经纬度集合
+        private val latLngList: List<LatLng>,
+        /// 描边的颜色
+        private val strokeColor: String,
+        //填充色
+        private val fillColor: String,
+        /// 线段的宽度
+        private val strokeWidth: Double
+) {
+    fun applyTo(amap: AMap) {
+        amap.addPolygon(PolygonOptions().apply {
+            addAll(latLngList)
+            strokeColor(this@UnifiedPolygonOptions.strokeColor.hexStringToColorInt() ?: Color.BLACK)
+            fillColor(this@UnifiedPolygonOptions.fillColor.hexStringToColorInt() ?: Color.BLACK)
+            strokeWidth(this@UnifiedPolygonOptions.strokeWidth.toFloat())
+        })
+    }
 }
 
 class UnifiedUiSettings(

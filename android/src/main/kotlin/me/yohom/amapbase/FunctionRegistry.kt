@@ -33,7 +33,12 @@ val MAP_METHOD_HANDLER: Map<String, MapMethodHandler> = mapOf(
         "map#setMapCustomEnable" to SetMapCustomEnable,
         "map#setCustomMapStyleID" to SetCustomMapStyleID,
         "map#getCenterPoint" to GetCenterLnglat,
-        "map#changeLatLng" to ChangeLatLng
+        "map#changeLatLng" to ChangeLatLng,
+        //以下为扩展的方法
+        "map#addPolygon" to AddPolygon,
+        "map#setSmoothMarker" to SmoothMarker,
+        "map#moveSmoothMarker" to SmoothMarker,
+        "map#removeSmoothMarker" to SmoothMarker
 )
 
 /**

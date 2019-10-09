@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 
+import 'model/polygon_options.dart';
+import 'model/simple_loc.dart';
+
 class AMapController {
   final MethodChannel _mapChannel;
   final EventChannel _markerClickedEventChannel;
@@ -256,6 +259,40 @@ class AMapController {
     return _mapChannel.invokeMethod(
       'map#setCustomMapStyleID',
       {'styleId': styleId},
+    );
+  }
+
+  /// 添加面
+  Future addPolygon(PolygonOptions options) {
+    L.p('addPolyline dart端参数: options -> $options');
+
+    return _mapChannel.invokeMethod(
+      'map#addPolygon',
+      {'options': options.toJsonString()},
+    );
+  }
+
+  Future setSmoothMarker(MarkerOptions options) {
+    final _optionsJson = options.toJsonString();
+    L.p('方法setSmoothMarker dart端参数: _optionsJson -> $_optionsJson');
+    return _mapChannel.invokeMethod(
+      'marker#setSmoothMarker',
+      {'markerOptions': _optionsJson},
+    );
+  }
+
+  Future moveSmoothMarker(SimpleLoc simpleLoc) {
+    final _optionsJson = simpleLoc.toJsonString();
+    L.p('方法moveSmoothMarker dart端参数: _optionsJson -> $_optionsJson');
+    return _mapChannel.invokeMethod(
+      'marker#moveSmoothMarker',
+      {'markerOptions': _optionsJson},
+    );
+  }
+
+  Future removeSmoothMarker() {
+    return _mapChannel.invokeMethod(
+      'marker#removeSmoothMarker',
     );
   }
 
