@@ -26,6 +26,8 @@ export 'src/map/model/my_location_style.dart';
 export 'src/map/model/polyline_options.dart';
 export 'src/map/model/route_overlay.dart';
 export 'src/map/model/ui_settings.dart';
+export 'src/map/model/simple_loc.dart';
+export 'src/map/model/polygon_options.dart';
 export 'src/map/offline_manager.dart';
 export 'src/navi/amap_navi.dart';
 export 'src/search/amap_search.dart';
