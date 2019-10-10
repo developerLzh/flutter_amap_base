@@ -560,16 +560,16 @@ object SmoothMarker : MapMethodHandler {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "map#setSmoothMarker" -> {
+            "marker#setSmoothMarker" -> {
                 val optionsJson = call.argument<String>("markerOptions") ?: "{}"
-                log("map#setSmoothMarker android端参数: markerOptions -> $optionsJson")
+                log("marker#setSmoothMarker android端参数: markerOptions -> $optionsJson")
                 val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
 
                 smoothMoveMarker = MySmoothMarker(map, temp.applyTo(AddMarker.map))
             }
-            "map#moveSmoothMarker" -> {
+            "marker#moveSmoothMarker" -> {
                 val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
-                log("map#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
+                log("marker#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
 
                 val latLng = LatLng(simpleLoc!!.lat,simpleLoc.lng)
                 smoothMoveMarker?.startMove(latLng,3000,true)
@@ -583,7 +583,7 @@ object SmoothMarker : MapMethodHandler {
                     marker.setAnchor(0.5f, 0.5f)
                 }
             }
-            "map#removeSmoothMarker" -> {
+            "marker#removeSmoothMarker" -> {
                 smoothMoveMarker?.destory()
                 smoothMoveMarker = null
             }
