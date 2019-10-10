@@ -5,7 +5,6 @@
 #import <Foundation/Foundation.h>
 #import "IMethodHandler.h"
 
-
 @interface SetCustomMapStyleID : NSObject <MapMethodHandler>
 @end
 
@@ -71,6 +70,17 @@
 @interface ChangeLatLng : NSObject <MapMethodHandler>
 @end
 
+/** 绘制面 */
+@interface AddPolygon : NSObject <MapMethodHandler>
+@end
+
+/** 可以平滑移动的Annotation */
+@interface SmoothMarker : NSObject <MapMethodHandler>
+@end
+
+/** 判断点是否在圈内 */
+@interface IsInGeoArea : NSObject <MapMethodHandler>
+@end
 
 @interface SetMapStatusLimits : NSObject<MapMethodHandler>
 @end

@@ -3,7 +3,6 @@
 //
 
 #import "AMapViewFactory.h"
-#import "MAMapView.h"
 #import "MapModels.h"
 #import "AMapBasePlugin.h"
 #import "UnifiedAssets.h"
@@ -11,6 +10,7 @@
 #import "NSString+Color.h"
 #import "FunctionRegistry.h"
 #import "MapHandlers.h"
+#import "XKMoveAnnotationView.h"
 
 static NSString *mapChannelName = @"me.yohom/map";
 static NSString *markerClickedChannelName = @"me.yohom/marker_clicked";
@@ -188,7 +188,7 @@ static NSString *mapDragChangeChannelName = @"me.yohom/map_drag_change";
 /// 渲染overlay回调
 - (MAOverlayRenderer *)mapView:(MAMapView *)mapView rendererForOverlay:(id <MAOverlay>)overlay {
   // 绘制折线
-  if ([overlay isKindOfClass:[PolylineOverlay class]]) {
+  if ([overlay isMemberOfClass:[PolylineOverlay class]]) {
     PolylineOverlay *polyline = (PolylineOverlay *) overlay;
 
     MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:polyline];
@@ -206,6 +206,21 @@ static NSString *mapDragChangeChannelName = @"me.yohom/map_drag_change";
     }
 
     return polylineRenderer;
+  } else if ([overlay isMemberOfClass:[PolygonOverlay class]]) {
+  // 绘制面
+      PolygonOverlay * polygon = (PolygonOverlay *) overlay;
+      
+      MAPolygonRenderer *polylineRenderer = [[MAPolygonRenderer alloc] initWithPolygon:polygon];
+      
+      UnifiedPolygonOptions *options = polygon.options;
+      
+      polylineRenderer.miterLimit   = 4;
+      polylineRenderer.lineWidth    = (CGFloat) (options.strokeWidth * 0.5);
+      polylineRenderer.fillColor    = [options.fillColor hexStringToColor];
+      polylineRenderer.strokeColor  = [options.strokeColor hexStringToColor];
+      polylineRenderer.lineJoinType = kMALineJoinRound;
+      
+      return polylineRenderer;
   }
 
   return nil;
@@ -213,52 +228,78 @@ static NSString *mapDragChangeChannelName = @"me.yohom/map_drag_change";
 
 /// 渲染annotation, 就是Android中的marker
 - (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id <MAAnnotation>)annotation {
-  if ([annotation isKindOfClass:[MAUserLocation class]]) {
+    if ([annotation isKindOfClass:[MAUserLocation class]]) {
+        return nil;
+    }
+    
+    /// 可移动Annotation
+    if ([annotation isMemberOfClass:[MoveMarkerAnnotation class]]) {
+        
+        static NSString *moveAnnotationIdentifier = @"MoveAnnotationIdentifier";
+        XKMoveAnnotationView *annotationView = (XKMoveAnnotationView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:moveAnnotationIdentifier];
+        if (annotationView == nil) {
+            annotationView = [[XKMoveAnnotationView alloc] initWithAnnotation:annotation
+                                                              reuseIdentifier:moveAnnotationIdentifier];
+        }
+        UnifiedMarkerOptions *options = ((MarkerAnnotation *) annotation).markerOptions;
+        annotationView.zIndex = (NSInteger) options.zIndex;
+        if (options.icon != nil) {
+            annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getAssetPath:options.icon]];
+        } else {
+            annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/default_marker.png"]];
+        }
+        annotationView.centerOffset = CGPointMake(options.anchorU, options.anchorV);
+        annotationView.calloutOffset = CGPointMake(options.infoWindowOffsetX, options.infoWindowOffsetY);
+        annotationView.draggable = options.draggable;
+        annotationView.canShowCallout = options.infoWindowEnable;
+        annotationView.enabled = options.enabled;
+        annotationView.highlighted = options.highlighted;
+        annotationView.selected = options.selected;
+        return annotationView;
+    }
+    
+    if ([annotation isKindOfClass:[MAPointAnnotation class]]) {
+        
+        static NSString *routePlanningCellIdentifier = @"RoutePlanningCellIdentifier";
+        MAAnnotationView *annotationView = [_mapView dequeueReusableAnnotationViewWithIdentifier:routePlanningCellIdentifier];
+        if (annotationView == nil) {
+            annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation
+                                                          reuseIdentifier:routePlanningCellIdentifier];
+        }
+
+        if ([annotation isMemberOfClass:[MarkerAnnotation class]]) {
+            UnifiedMarkerOptions *options = ((MarkerAnnotation *) annotation).markerOptions;
+            annotationView.zIndex = (NSInteger) options.zIndex;
+            if (options.icon != nil) {
+                annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getAssetPath:options.icon]];
+            } else {
+                annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/default_marker.png"]];
+            }
+            annotationView.centerOffset = CGPointMake(options.anchorU, options.anchorV);
+            annotationView.calloutOffset = CGPointMake(options.infoWindowOffsetX, options.infoWindowOffsetY);
+            annotationView.draggable = options.draggable;
+            annotationView.canShowCallout = options.infoWindowEnable;
+            annotationView.enabled = options.enabled;
+            annotationView.highlighted = options.highlighted;
+            annotationView.selected = options.selected;
+        } else {
+            if ([[annotation title] isEqualToString:@"起点"]) {
+                annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/amap_start.png"]];
+            } else if ([[annotation title] isEqualToString:@"终点"]) {
+                annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/amap_end.png"]];
+            }
+        }
+
+        if (annotationView.image != nil) {
+            CGSize size = annotationView.imageView.frame.size;
+            annotationView.frame = CGRectMake(annotationView.center.x + size.width / 2, annotationView.center.y, 36, 36);
+            annotationView.centerOffset = CGPointMake(0, -18);
+        }
+
+        return annotationView;
+    }
+
     return nil;
-  }
-
-  if ([annotation isKindOfClass:[MAPointAnnotation class]]) {
-    static NSString *routePlanningCellIdentifier = @"RoutePlanningCellIdentifier";
-
-    MAAnnotationView *annotationView = [_mapView dequeueReusableAnnotationViewWithIdentifier:routePlanningCellIdentifier];
-    if (annotationView == nil) {
-      annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation
-                                                    reuseIdentifier:routePlanningCellIdentifier];
-    }
-
-    if ([annotation isKindOfClass:[MarkerAnnotation class]]) {
-      UnifiedMarkerOptions *options = ((MarkerAnnotation *) annotation).markerOptions;
-      annotationView.zIndex = (NSInteger) options.zIndex;
-      if (options.icon != nil) {
-        annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getAssetPath:options.icon]];
-      } else {
-        annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/default_marker.png"]];
-      }
-      annotationView.centerOffset = CGPointMake(options.anchorU, options.anchorV);
-      annotationView.calloutOffset = CGPointMake(options.infoWindowOffsetX, options.infoWindowOffsetY);
-      annotationView.draggable = options.draggable;
-      annotationView.canShowCallout = options.infoWindowEnable;
-      annotationView.enabled = options.enabled;
-      annotationView.highlighted = options.highlighted;
-      annotationView.selected = options.selected;
-    } else {
-      if ([[annotation title] isEqualToString:@"起点"]) {
-        annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/amap_start.png"]];
-      } else if ([[annotation title] isEqualToString:@"终点"]) {
-        annotationView.image = [UIImage imageWithContentsOfFile:[UnifiedAssets getDefaultAssetPath:@"images/amap_end.png"]];
-      }
-    }
-
-    if (annotationView.image != nil) {
-      CGSize size = annotationView.imageView.frame.size;
-      annotationView.frame = CGRectMake(annotationView.center.x + size.width / 2, annotationView.center.y, 36, 36);
-      annotationView.centerOffset = CGPointMake(0, -18);
-    }
-
-    return annotationView;
-  }
-
-  return nil;
 }
 
 @end
