@@ -3,12 +3,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MAAnimatedAnnotation.h"
 #import "MAPointAnnotation.h"
 #import "MAPolyline.h"
+#import "MAPolygon.h"
 
 @class UnifiedMarkerOptions;
 @class LatLng;
 @class CameraPosition;
+@class UnifiedPolygonOptions;
 @class UnifiedPolylineOptions;
 @class MAMapView;
 
@@ -17,9 +20,27 @@
 @property(nonatomic) UnifiedMarkerOptions *markerOptions;
 @end
 
+@interface MoveMarkerAnnotation : MAAnimatedAnnotation
+@property(nonatomic, copy) NSString *annType;
+@property(nonatomic) UnifiedMarkerOptions *markerOptions;
+
+/**
+ * 初始化可移动Annotation
+
+ @param map <#map description#>
+ @param markerOptions <#markerOptions description#>
+ @return <#return value description#>
+ */
++ (MoveMarkerAnnotation *)initAnnotationWithMap:(MAMapView *)map
+                                  markerOptions:(UnifiedMarkerOptions *)markerOptions;
+@end
 
 @interface PolylineOverlay : MAPolyline
 @property(nonatomic) UnifiedPolylineOptions *options;
+@end
+
+@interface PolygonOverlay : MAPolygon
+@property(nonatomic) UnifiedPolygonOptions *options;
 @end
 
 
@@ -79,6 +100,8 @@
 
 @property(nonatomic) CGFloat latitude;
 @property(nonatomic) CGFloat longitude;
+
++ (LatLng *)initLatitude:(CGFloat)latitude longitude:(CGFloat)longitude;
 
 - (CLLocationCoordinate2D)toCLLocationCoordinate2D;
 
@@ -155,6 +178,24 @@
 @property(nonatomic) NSString *image;
 
 - (NSString *)description;
+
+- (void)applyTo:(MAMapView *)mapView;
+
+@end
+
+
+@interface UnifiedPolygonOptions : NSObject
+
++ (instancetype)initWithJson:(NSString *)json;
+
+/// 经纬度集合
+@property(nonatomic, copy) NSArray<LatLng *> *latLngList;
+/// 描边的颜色
+@property(nonatomic, copy) NSString *strokeColor;
+/// 填充色
+@property(nonatomic, copy) NSString *fillColor;
+/// 线段的宽度
+@property(nonatomic, assign) CGFloat strokeWidth;
 
 - (void)applyTo:(MAMapView *)mapView;
 

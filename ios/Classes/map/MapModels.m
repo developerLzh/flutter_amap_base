@@ -2,6 +2,7 @@
 // Created by Yohom Bao on 2018-12-15.
 //
 
+#import "MAPolygon.h"
 #import "MAMapView.h"
 #import "MapModels.h"
 #import "NSString+Color.h"
@@ -14,10 +15,31 @@
 
 @end
 
+@implementation MoveMarkerAnnotation
+
++ (MoveMarkerAnnotation *)initAnnotationWithMap:(MAMapView *)map
+                                  markerOptions:(UnifiedMarkerOptions *)markerOptions {
+    MoveMarkerAnnotation *annotation = [[MoveMarkerAnnotation alloc] init];
+    annotation.coordinate = [markerOptions.position toCLLocationCoordinate2D];
+    annotation.title = markerOptions.title;
+    annotation.subtitle = markerOptions.snippet;
+    annotation.markerOptions = markerOptions;
+
+    [map addAnnotation:annotation];
+    return annotation;
+}
+
+@end
+
 
 @implementation PolylineOverlay {
 
 }
+@end
+
+
+@implementation PolygonOverlay
+
 @end
 
 
@@ -79,6 +101,13 @@
 @implementation LatLng {
 }
 
++ (LatLng *)initLatitude:(CGFloat)latitude longitude:(CGFloat)longitude {
+    LatLng *latLng = [[self alloc] init];
+    latLng.latitude = latitude;
+    latLng.longitude = longitude;
+    return latLng;
+}
+
 - (CLLocationCoordinate2D)toCLLocationCoordinate2D {
     return CLLocationCoordinate2DMake(self.latitude, self.longitude);
 }
@@ -106,6 +135,7 @@
 @implementation UnifiedMarkerOptions {
 
 }
+
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.icon=%p", self.icon];
@@ -178,6 +208,40 @@
     [mapView updateUserLocationRepresentation:r];
 }
 
+
+@end
+
+
+@implementation UnifiedPolygonOptions {
+    
+}
+
++ (instancetype)initWithJson:(NSString *)json {
+    [UnifiedPolygonOptions mj_setupObjectClassInArray:^NSDictionary *{
+        return @{
+                 @"latLngList" : @"LatLng",
+                 };
+    }];
+    return [UnifiedPolygonOptions mj_objectWithKeyValues:json];
+}
+
+- (void)applyTo:(MAMapView *)mapView {
+    NSInteger count = _latLngList.count;
+    /// 绘制面数据
+    CLLocationCoordinate2D *coordinates = malloc(sizeof(CLLocationCoordinate2D) * count);
+    for (int i = 0; i < _latLngList.count; i++) {
+        
+        LatLng *latLng = _latLngList[i];
+        coordinates[i] = CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+    }
+    /// 添加覆盖物
+    PolygonOverlay *polygonOverlay = [PolygonOverlay polygonWithCoordinates:coordinates count:count];
+    polygonOverlay.options = self;
+    [mapView addOverlay:polygonOverlay level:MAOverlayLevelAboveRoads];
+    /// 释放内存
+    free(coordinates);
+    coordinates = NULL;
+}
 
 @end
 

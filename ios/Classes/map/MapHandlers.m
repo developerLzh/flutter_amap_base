@@ -7,9 +7,13 @@
 #import "MAMapView.h"
 #import "AMapFoundationKit.h"
 #import "AMapViewFactory.h"
+#import "MySmoothMarker.h"
 #import "MapModels.h"
 #import "MJExtension.h"
 #import "UnifiedAssets.h"
+
+#import "SimpleLoc.h"
+#import "XKMoveAnnotationView.h"
 
 
 @implementation SetCustomMapStyleID {
@@ -26,8 +30,10 @@
     NSString *styleId = (NSString *) paramDic[@"styleId"];
 
     NSLog(@"方法map#setCustomMapStyleID iOS: styleId -> %@", styleId);
-
-    [_mapView setCustomMapStyleID:styleId];
+    
+    MAMapCustomStyleOptions *options = [MAMapCustomStyleOptions new];
+    options.styleId = styleId;
+    [_mapView setCustomMapStyleOptions:options];
     result(success);
 }
 
@@ -463,6 +469,120 @@
 
 @end
 
+
+/** 绘制面 */
+@implementation AddPolygon {
+    MAMapView *_mapView;
+}
+
+- (NSObject <MapMethodHandler> *)initWith:(MAMapView *)mapView {
+    _mapView = mapView;
+    return self;
+}
+
+- (void)onMethodCall:(FlutterMethodCall *)call :(FlutterResult)result {
+    NSString *optionsJson = (NSString *) call.arguments[@"options"];
+    
+    NSLog(@"map#AddPolygon ios端参数: optionsJson -> %@", optionsJson);
+    
+    UnifiedPolygonOptions *options = [UnifiedPolygonOptions initWithJson:optionsJson];
+    
+    [options applyTo:_mapView];
+    
+    result(success);
+}
+
+@end
+
+
+/** 可以平滑移动的Annotation */
+@implementation SmoothMarker {
+    MAMapView *_mapView;
+    MySmoothMarker *_smoothMoveMarker;
+}
+
+- (NSObject<MapMethodHandler> *)initWith:(MAMapView *)mapView {
+    _mapView = mapView;
+    return self;
+}
+
+- (void)onMethodCall:(FlutterMethodCall *)call :(FlutterResult)result {
+    if ([call.method isEqualToString:@"marker#setSmoothMarker"]) {
+        
+        /// setup marker
+        NSString *optionsJson = (NSString *) call.arguments[@"markerOptions"];
+
+        NSLog(@"map#SmoothMarker ios端参数: optionsJson -> %@", optionsJson);
+        /// marker数据
+        UnifiedMarkerOptions *markerOptions = [UnifiedMarkerOptions mj_objectWithKeyValues:optionsJson];
+        /// initAnnotation
+        MoveMarkerAnnotation *marker = [MoveMarkerAnnotation initAnnotationWithMap:_mapView
+                                                                     markerOptions:markerOptions];
+        /// initMySmoothMarker
+        _smoothMoveMarker = [[MySmoothMarker alloc] initWithMarker:marker
+                                                           mapView:_mapView];
+        
+    } else if ([call.method isEqualToString:@"marker#moveSmoothMarker"]) {
+        
+        /// 平滑移动marker到下一个点
+        /// setup marker
+        NSString *optionsJson = (NSString *) call.arguments[@"simpleLoc"];
+        
+        NSLog(@"map#SmoothMarker ios端参数: optionsJson -> %@", optionsJson);
+        /// SimpleLoc数据
+        SimpleLoc *simpleLoc = [SimpleLoc mj_objectWithKeyValues:optionsJson];
+        
+        LatLng *latLng = [LatLng initLatitude:simpleLoc.lat longitude:simpleLoc.lng];
+        [_smoothMoveMarker startMove:latLng time:1.0f isContinue:YES];
+        
+        XKMoveAnnotationView * annView = (XKMoveAnnotationView *)[_mapView viewForAnnotation:(id)_smoothMoveMarker];
+        [annView setUpHeading:simpleLoc.bearing];
+        
+    } else if ([call.method isEqualToString:@"marker#removeSmoothMarker"]) {
+        
+        /// 移除平滑移动的marker
+        [_smoothMoveMarker removeSmoothMarker];
+        _smoothMoveMarker = nil;
+        
+    }
+    result(success);
+}
+
+@end
+
+
+@implementation IsInGeoArea {
+    MAMapView *_mapView;
+}
+
+- (NSObject<MapMethodHandler> *)initWith:(MAMapView *)mapView {
+    _mapView = mapView;
+    return self;
+}
+
+- (void)onMethodCall:(FlutterMethodCall *)call :(FlutterResult)result {
+    NSString *targetJson = (NSString *) call.arguments[@"target"];
+    NSString *areaJson   = (NSString *) call.arguments[@"area"];
+    
+    NSLog(@"map#IsInGeoArea ios端参数: targetJson -> %@  |  areaJson -> %@", targetJson, areaJson);
+    /// SimpleLoc数据
+    LatLng *targetLatLng = [LatLng mj_objectWithKeyValues:targetJson];
+    NSMutableArray *areaArray = [LatLng mj_objectArrayWithKeyValuesArray:areaJson];
+    
+    CLLocationCoordinate2D coords[areaArray.count];
+    for (int i = 0; i < areaArray.count; i ++) {
+        LatLng *latLng = areaArray[i];
+        coords[i] = CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
+    }
+    
+    /// 计算经纬度是否在多边形内
+    BOOL isInGeoArea = MAPolygonContainsCoordinate(CLLocationCoordinate2DMake(targetLatLng.latitude, targetLatLng.longitude), coords, sizeof(coords) / sizeof(coords[0]));
+    result(@(isInGeoArea));
+}
+
+@end
+
+
 @implementation SetMapStatusLimits {
     MAMapView *_mapView;
 }
@@ -594,4 +714,7 @@
         result(r);
     }];
 }
+
+
+
 @end
