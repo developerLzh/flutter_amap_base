@@ -36,9 +36,10 @@ val MAP_METHOD_HANDLER: Map<String, MapMethodHandler> = mapOf(
         "map#changeLatLng" to ChangeLatLng,
         //以下为扩展的方法
         "map#addPolygon" to AddPolygon,
-        "map#setSmoothMarker" to SmoothMarker,
-        "map#moveSmoothMarker" to SmoothMarker,
-        "map#removeSmoothMarker" to SmoothMarker
+        "marker#setSmoothMarker" to SmoothMarker,
+        "marker#moveSmoothMarker" to SmoothMarker,
+        "marker#removeSmoothMarker" to SmoothMarker,
+        "map#isInGeoArea" to IsInGeoArea
 )
 
 /**

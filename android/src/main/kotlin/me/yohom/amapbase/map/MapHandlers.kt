@@ -9,6 +9,7 @@ import com.amap.api.maps.CoordinateConverter
 import com.amap.api.maps.model.CameraPosition
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.LatLngBounds
+import com.amap.api.maps.model.PolygonOptions
 import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.amap.api.maps.utils.overlay.SmoothMoveMarker
 import io.flutter.plugin.common.MethodCall
@@ -395,75 +396,6 @@ object ChangeLatLng : MapMethodHandler {
     }
 }
 
-/**
- * 绘制面
- */
-object AddPolygon : MapMethodHandler {
-    lateinit var map: AMap
-
-    override fun with(map: AMap): MapMethodHandler {
-        this.map = map
-        return this
-    }
-
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        val options = call.argument<String>("options")?.parseFieldJson<UnifiedPolygonOptions>()
-
-        log("map#AddPolygon android端参数: options -> $options")
-
-        options?.applyTo(map)
-
-        result.success(success)
-    }
-}
-
-/**
- * 可以平滑移动的marker
- */
-object SmoothMarker : MapMethodHandler {
-    lateinit var map: AMap
-    var smoothMoveMarker: MySmoothMarker? = null
-
-    override fun with(map: AMap): MapMethodHandler {
-        this.map = map
-        return this
-    }
-
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when (call.method) {
-            "map#setSmoothMarker" -> {
-                val optionsJson = call.argument<String>("markerOptions") ?: "{}"
-                log("map#setSmoothMarker android端参数: markerOptions -> $optionsJson")
-                val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
-
-                smoothMoveMarker = MySmoothMarker(map, temp.applyTo(AddMarker.map))
-            }
-            "map#moveSmoothMarker" -> {
-                val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
-                log("map#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
-
-                val latLng = LatLng(simpleLoc!!.lat,simpleLoc.lng)
-                smoothMoveMarker?.startMove(latLng,3000,true)
-
-                val marker = smoothMoveMarker!!.marker
-                if (null != marker) {
-                    marker.rotateAngle = 360.0f - simpleLoc.bearing + map.cameraPosition.bearing
-                    marker.isDraggable = false
-                    marker.isInfoWindowEnable = true
-                    marker.isClickable = false
-                    marker.setAnchor(0.5f, 0.5f)
-                }
-            }
-            "map#removeSmoothMarker" -> {
-                smoothMoveMarker?.destory()
-                smoothMoveMarker = null
-            }
-        }
-
-        result.success(success)
-    }
-}
-
 object GetCenterLnglat : MapMethodHandler {
     lateinit var map: AMap
     override fun with(map: AMap): MapMethodHandler {
@@ -589,5 +521,104 @@ object ScreenShot : MapMethodHandler {
                 }
             }
         })
+    }
+}
+
+/**
+ * 绘制面
+ */
+object AddPolygon : MapMethodHandler {
+    lateinit var map: AMap
+
+    override fun with(map: AMap): MapMethodHandler {
+        this.map = map
+        return this
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        val options = call.argument<String>("options")?.parseFieldJson<UnifiedPolygonOptions>()
+
+        log("map#AddPolygon android端参数: options -> $options")
+
+        options?.applyTo(map)
+
+        result.success(success)
+    }
+}
+
+/**
+ * 可以平滑移动的marker
+ */
+object SmoothMarker : MapMethodHandler {
+    lateinit var map: AMap
+    var smoothMoveMarker: MySmoothMarker? = null
+
+    override fun with(map: AMap): MapMethodHandler {
+        this.map = map
+        return this
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "map#setSmoothMarker" -> {
+                val optionsJson = call.argument<String>("markerOptions") ?: "{}"
+                log("map#setSmoothMarker android端参数: markerOptions -> $optionsJson")
+                val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
+
+                smoothMoveMarker = MySmoothMarker(map, temp.applyTo(AddMarker.map))
+            }
+            "map#moveSmoothMarker" -> {
+                val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
+                log("map#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
+
+                val latLng = LatLng(simpleLoc!!.lat,simpleLoc.lng)
+                smoothMoveMarker?.startMove(latLng,3000,true)
+
+                val marker = smoothMoveMarker!!.marker
+                if (null != marker) {
+                    marker.rotateAngle = 360.0f - simpleLoc.bearing + map.cameraPosition.bearing
+                    marker.isDraggable = false
+                    marker.isInfoWindowEnable = true
+                    marker.isClickable = false
+                    marker.setAnchor(0.5f, 0.5f)
+                }
+            }
+            "map#removeSmoothMarker" -> {
+                smoothMoveMarker?.destory()
+                smoothMoveMarker = null
+            }
+        }
+
+        result.success(success)
+    }
+}
+
+/**
+ * 绘制面
+ */
+object IsInGeoArea : MapMethodHandler {
+    lateinit var map: AMap
+
+    override fun with(map: AMap): MapMethodHandler {
+        this.map = map
+        return this
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        val target = call.argument<String>("target")?.parseFieldJson<LatLng>()
+        val latlngs = call.argument<String>("area")?.parseFieldJson<List<LatLng>>()
+
+        val options = PolygonOptions()
+        if (latlngs != null) {
+            for (i in latlngs) {
+                options.add(i)
+            }
+        }
+        options.visible(false) //设置区域是否显示
+        val polygon = map.addPolygon(options)
+        val contains = polygon.contains(target)
+        polygon.remove()
+
+        result.success(contains)
     }
 }
