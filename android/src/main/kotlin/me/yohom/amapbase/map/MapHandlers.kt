@@ -566,6 +566,7 @@ object SmoothMarker : MapMethodHandler {
                 val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
 
                 smoothMoveMarker = MySmoothMarker(map, temp.applyTo(map))
+                smoothMoveMarker?.startMove(temp.position,0,true)
                 log("smoothMarker == null ? ${smoothMoveMarker==null}")
             }
             "marker#moveSmoothMarker" -> {
