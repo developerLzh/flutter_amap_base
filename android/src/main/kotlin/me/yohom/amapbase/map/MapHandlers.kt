@@ -422,7 +422,6 @@ object AddPolygon : MapMethodHandler {
  */
 object SmoothMarker : MapMethodHandler {
     lateinit var map: AMap
-    var lastLatLng: LatLng? = null
     var smoothMoveMarker: MySmoothMarker? = null
 
     override fun with(map: AMap): MapMethodHandler {
@@ -437,7 +436,6 @@ object SmoothMarker : MapMethodHandler {
                 log("map#setSmoothMarker android端参数: markerOptions -> $optionsJson")
                 val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
 
-                lastLatLng = temp.position
                 smoothMoveMarker = MySmoothMarker(map, temp.applyTo(AddMarker.map))
             }
             "map#moveSmoothMarker" -> {
@@ -446,7 +444,6 @@ object SmoothMarker : MapMethodHandler {
 
                 val latLng = LatLng(simpleLoc!!.lat,simpleLoc.lng)
                 smoothMoveMarker?.startMove(latLng,3000,true)
-                lastLatLng = latLng
 
                 val marker = smoothMoveMarker!!.marker
                 if (null != marker) {
@@ -460,7 +457,6 @@ object SmoothMarker : MapMethodHandler {
             "map#removeSmoothMarker" -> {
                 smoothMoveMarker?.destory()
                 smoothMoveMarker = null
-                lastLatLng = null
             }
         }
 

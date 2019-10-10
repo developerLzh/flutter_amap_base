@@ -272,6 +272,7 @@ class AMapController {
     );
   }
 
+  ///设置平滑移动的marker信息
   Future setSmoothMarker(MarkerOptions options) {
     final _optionsJson = options.toJsonString();
     L.p('方法setSmoothMarker dart端参数: _optionsJson -> $_optionsJson');
@@ -281,15 +282,17 @@ class AMapController {
     );
   }
 
+  /// 平滑移动marker到下一个点
   Future moveSmoothMarker(SimpleLoc simpleLoc) {
-    final _optionsJson = simpleLoc.toJsonString();
-    L.p('方法moveSmoothMarker dart端参数: _optionsJson -> $_optionsJson');
+    final _locJson = simpleLoc.toJsonString();
+    L.p('方法moveSmoothMarker dart端参数: _optionsJson -> $_locJson');
     return _mapChannel.invokeMethod(
       'marker#moveSmoothMarker',
-      {'markerOptions': _optionsJson},
+      {'simpleLoc': _locJson},
     );
   }
 
+  /// 移除平滑移动的marker
   Future removeSmoothMarker() {
     return _mapChannel.invokeMethod(
       'marker#removeSmoothMarker',
