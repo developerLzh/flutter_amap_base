@@ -123,7 +123,7 @@ class UnifiedMarkerOptions(
     )
 
     fun applyTo(map: AMap):Marker {
-        map.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(position).build(), 100))
+//        map.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(position).build(), 100))
         return map.addMarker(toMarkerOption())
     }
 
