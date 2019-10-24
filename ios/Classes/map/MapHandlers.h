@@ -76,6 +76,7 @@
 
 /** 可以平滑移动的Annotation */
 @interface SmoothMarker : NSObject <MapMethodHandler>
++ (instancetype)singleton;
 @end
 
 /** 判断点是否在圈内 */

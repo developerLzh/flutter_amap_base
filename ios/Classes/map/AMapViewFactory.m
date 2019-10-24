@@ -155,12 +155,12 @@ static NSString *mapClickChannelName = @"me.yohom/map_click_event_channel";
 
 
     _mapHandler = [[MapEventHandler alloc] init];
-    _mapDragChangeEventChannel = [FlutterEventChannel eventChannelWithName:[NSString stringWithFormat:@"%@", mapDragChangeChannelName] binaryMessenger:[AMapBasePlugin registrar].messenger];
+    _mapDragChangeEventChannel = [FlutterEventChannel eventChannelWithName:[NSString stringWithFormat:@"%@%lld", mapDragChangeChannelName, _viewId] binaryMessenger:[AMapBasePlugin registrar].messenger];
     [_mapDragChangeEventChannel setStreamHandler:_mapHandler];
     
     
     _mapClickHandler = [[MapEventHandler alloc] init];
-    _mapClickEventChannel = [FlutterEventChannel eventChannelWithName:[NSString stringWithFormat:@"%@", mapClickChannelName] binaryMessenger:[AMapBasePlugin registrar].messenger];
+    _mapClickEventChannel = [FlutterEventChannel eventChannelWithName:[NSString stringWithFormat:@"%@%lld", mapClickChannelName, _viewId] binaryMessenger:[AMapBasePlugin registrar].messenger];
     [_mapClickEventChannel setStreamHandler:_mapClickHandler];
 }
 
@@ -173,15 +173,18 @@ static NSString *mapClickChannelName = @"me.yohom/map_click_event_channel";
 - (void)mapView:(MAMapView *)mapView didSingleTappedAtCoordinate:(CLLocationCoordinate2D)coordinate {
     LatLng *coor = [[LatLng alloc] init];
     coor.longitude = mapView.centerCoordinate.longitude;
-    coor.latitude = mapView.centerCoordinate.latitude;
+    coor.latitude  = mapView.centerCoordinate.latitude;
     !_mapClickHandler.sink?:_mapClickHandler.sink([coor mj_JSONString]);
 }
-/// 拖拽
+/**
+ * @brief 地图移动结束后调用此接口
+ * @param mapView       地图view
+ * @param wasUserAction 标识是否是用户动作
+ */
 - (void)mapView:(MAMapView *)mapView mapDidMoveByUser:(BOOL)wasUserAction {
     LatLng *coor = [[LatLng alloc] init];
-    coor.longitude =mapView.centerCoordinate.longitude;
-    coor.latitude =mapView.centerCoordinate.latitude;
-//    NSLog(@"%@", [coor mj_JSONString]);
+    coor.longitude = mapView.centerCoordinate.longitude;
+    coor.latitude  = mapView.centerCoordinate.latitude;
     !_mapHandler.sink?:_mapHandler.sink([coor mj_JSONString]);
 }
 
@@ -196,8 +199,8 @@ static NSString *mapClickChannelName = @"me.yohom/map_click_event_channel";
 /// 点击annotation回调
 - (void)mapView:(MAMapView *)mapView didSelectAnnotationView:(MAAnnotationView *)view {
   if ([view.annotation isKindOfClass:[MarkerAnnotation class]]) {
-    MarkerAnnotation *annotation = (MarkerAnnotation *) view.annotation;
-    _eventHandler.sink([annotation.markerOptions mj_JSONString]);
+      MarkerAnnotation *annotation = (MarkerAnnotation *) view.annotation;
+      !_eventHandler.sink?:_eventHandler.sink([annotation.markerOptions mj_JSONString]);
   }
 }
 

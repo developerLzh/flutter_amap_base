@@ -496,9 +496,24 @@
 
 
 /** 可以平滑移动的Annotation */
-@implementation SmoothMarker {
-    MAMapView *_mapView;
-    MySmoothMarker *_smoothMoveMarker;
+static SmoothMarker * _smoothMarker;
+@interface SmoothMarker()
+/** 地图 */
+@property (nonatomic, strong) MAMapView *mapView;
+/** marker */
+@property (nonatomic, strong) MySmoothMarker *smoothMoveMarker;
+@end
+
+@implementation SmoothMarker
+
++ (instancetype)singleton {
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        
+        _smoothMarker = [[SmoothMarker alloc] init];
+    });
+    return _smoothMarker;
 }
 
 - (NSObject<MapMethodHandler> *)initWith:(MAMapView *)mapView {
@@ -519,7 +534,7 @@
         MoveMarkerAnnotation *marker = [MoveMarkerAnnotation initAnnotationWithMap:_mapView
                                                                      markerOptions:markerOptions];
         /// initMySmoothMarker
-        _smoothMoveMarker = [[MySmoothMarker alloc] initWithMarker:marker
+        self.smoothMoveMarker = [[MySmoothMarker alloc] initWithMarker:marker
                                                            mapView:_mapView];
         
     } else if ([call.method isEqualToString:@"marker#moveSmoothMarker"]) {
@@ -533,16 +548,16 @@
         SimpleLoc *simpleLoc = [SimpleLoc mj_objectWithKeyValues:optionsJson];
         
         LatLng *latLng = [LatLng initLatitude:simpleLoc.lat longitude:simpleLoc.lng];
-        [_smoothMoveMarker startMove:latLng time:1.0f isContinue:YES];
+        [self.smoothMoveMarker startMove:latLng time:1.0f isContinue:YES];
         
-        XKMoveAnnotationView * annView = (XKMoveAnnotationView *)[_mapView viewForAnnotation:(id)_smoothMoveMarker];
+        XKMoveAnnotationView * annView = (XKMoveAnnotationView *)[self.mapView viewForAnnotation:(id)_smoothMoveMarker];
         [annView setUpHeading:simpleLoc.bearing];
         
     } else if ([call.method isEqualToString:@"marker#removeSmoothMarker"]) {
         
         /// 移除平滑移动的marker
-        [_smoothMoveMarker removeSmoothMarker];
-        _smoothMoveMarker = nil;
+        [self.smoothMoveMarker removeSmoothMarker];
+        self.smoothMoveMarker = nil;
         
     }
     result(success);
@@ -569,14 +584,16 @@
     LatLng *targetLatLng = [LatLng mj_objectWithKeyValues:targetJson];
     NSMutableArray *areaArray = [LatLng mj_objectArrayWithKeyValuesArray:areaJson];
     
-    CLLocationCoordinate2D coords[areaArray.count];
+    CLLocationCoordinate2D *coords = malloc(sizeof(CLLocationCoordinate2D) * areaArray.count);
     for (int i = 0; i < areaArray.count; i ++) {
         LatLng *latLng = areaArray[i];
         coords[i] = CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude);
     }
     
     /// 计算经纬度是否在多边形内
-    BOOL isInGeoArea = MAPolygonContainsCoordinate(CLLocationCoordinate2DMake(targetLatLng.latitude, targetLatLng.longitude), coords, sizeof(coords) / sizeof(coords[0]));
+    CLLocationCoordinate2D coor = CLLocationCoordinate2DMake(targetLatLng.latitude, targetLatLng.longitude);
+    BOOL isInGeoArea = MAPolygonContainsCoordinate(coor, coords, areaArray.count);
+    free(coords);
     result(@(isInGeoArea));
 }
 

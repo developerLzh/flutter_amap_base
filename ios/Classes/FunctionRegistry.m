@@ -41,6 +41,13 @@ static NSDictionary<NSString *, NSObject <MapMethodHandler> *> *_mapDictionary;
                 
                 @"tool#calcDistance":[CalcDistance alloc],
                 @"map#getCenterPoint":[GetCenterPoint alloc],
+                
+                // 新增
+                @"map#addPolygon": [AddPolygon alloc],
+                @"marker#setSmoothMarker": [SmoothMarker singleton],
+                @"marker#moveSmoothMarker": [SmoothMarker singleton],
+                @"marker#removeSmoothMarker": [SmoothMarker singleton],
+                @"map#isInGeoArea": [IsInGeoArea alloc]
         };
     }
     return _mapDictionary;
