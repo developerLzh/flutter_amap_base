@@ -623,9 +623,9 @@ object SmoothMarker : MapMethodHandler {
                 val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
                 log("marker#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
 
-                smoothMoveMarker?.getMarker().setTitle(getLeftTimeStr(simpleLoc!!.time))
-                smoothMoveMarker?.getMarker().setSnippet(getLeftDisStr(simpleLoc!!.dis))
-                smoothMoveMarker?.getMarker().showInfoWindow()
+                smoothMoveMarker?.getMarker()!!.setTitle(getLeftTimeStr(simpleLoc!!.time))
+                smoothMoveMarker?.getMarker()!!.setSnippet(getLeftDisStr(simpleLoc!!.dis))
+                smoothMoveMarker?.getMarker()!!.showInfoWindow()
 
                 val latLng = LatLng(simpleLoc!!.lat, simpleLoc.lng)
                 smoothMoveMarker?.startMove(latLng, 3000, true)
