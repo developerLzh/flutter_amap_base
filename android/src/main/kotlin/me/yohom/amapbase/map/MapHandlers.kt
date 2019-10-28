@@ -6,10 +6,7 @@ import com.amap.api.maps.AMap
 import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.CoordinateConverter
-import com.amap.api.maps.model.CameraPosition
-import com.amap.api.maps.model.LatLng
-import com.amap.api.maps.model.LatLngBounds
-import com.amap.api.maps.model.PolygonOptions
+import com.amap.api.maps.model.*
 import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.amap.api.maps.utils.overlay.SmoothMoveMarker
 import io.flutter.plugin.common.MethodCall
@@ -346,6 +343,8 @@ object AddMarkers : MapMethodHandler {
 object AddPolyline : MapMethodHandler {
     lateinit var map: AMap
 
+    var lastPolyline: Polyline? = null
+
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
         return this
@@ -353,10 +352,17 @@ object AddPolyline : MapMethodHandler {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val options = call.argument<String>("options")?.parseFieldJson<UnifiedPolylineOptions>()
+        val clearLast = call.argument<Boolean>("clearLast")
 
         log("map#AddPolyline android端参数: options -> $options")
 
-        options?.applyTo(map)
+        val temp = options?.applyTo(map)
+
+        if (null != clearLast) {
+            lastPolyline?.remove()
+        }
+
+        lastPolyline = temp
 
         result.success(success)
     }
@@ -566,15 +572,15 @@ object SmoothMarker : MapMethodHandler {
                 val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
 
                 smoothMoveMarker = MySmoothMarker(map, temp.applyTo(map))
-                smoothMoveMarker?.startMove(temp.position,0,true)
-                log("smoothMarker == null ? ${smoothMoveMarker==null}")
+                smoothMoveMarker?.startMove(temp.position, 0, true)
+                log("smoothMarker == null ? ${smoothMoveMarker == null}")
             }
             "marker#moveSmoothMarker" -> {
                 val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
                 log("marker#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
 
-                val latLng = LatLng(simpleLoc!!.lat,simpleLoc.lng)
-                smoothMoveMarker?.startMove(latLng,3000,true)
+                val latLng = LatLng(simpleLoc!!.lat, simpleLoc.lng)
+                smoothMoveMarker?.startMove(latLng, 3000, true)
 
                 val marker = smoothMoveMarker!!.marker
                 if (null != marker) {

@@ -122,7 +122,7 @@ class UnifiedMarkerOptions(
             belowMaskLayer = options.isBelowMaskLayer
     )
 
-    fun applyTo(map: AMap):Marker {
+    fun applyTo(map: AMap): Marker {
 //        map.animateCamera(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(position).build(), 100))
         return map.addMarker(toMarkerOption())
     }
@@ -223,8 +223,8 @@ class UnifiedPolylineOptions(
         private val isUseTexture: Boolean
 ) {
 
-    fun applyTo(map: AMap) {
-        map.addPolyline(PolylineOptions().apply {
+    fun applyTo(map: AMap): Polyline {
+        val pol = map.addPolyline(PolylineOptions().apply {
             addAll(this@UnifiedPolylineOptions.latLngList)
             width(this@UnifiedPolylineOptions.width.toFloat())
             color(this@UnifiedPolylineOptions.color.hexStringToColorInt() ?: Color.BLACK)
@@ -249,6 +249,7 @@ class UnifiedPolylineOptions(
             useGradient(this@UnifiedPolylineOptions.isUseGradient)
             isUseTexture = this@UnifiedPolylineOptions.isUseTexture
         })
+        return pol
     }
 }
 

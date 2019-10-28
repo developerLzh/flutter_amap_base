@@ -170,12 +170,15 @@ class AMapController {
   }
 
   /// 添加线
-  Future addPolyline(PolylineOptions options) {
+  Future addPolyline(PolylineOptions options, {bool clearLast = false}) {
     L.p('addPolyline dart端参数: options -> $options');
 
     return _mapChannel.invokeMethod(
       'map#addPolyline',
-      {'options': options.toJsonString()},
+      {
+        'options': options.toJsonString(),
+        'clearLast': clearLast,
+      },
     );
   }
 
