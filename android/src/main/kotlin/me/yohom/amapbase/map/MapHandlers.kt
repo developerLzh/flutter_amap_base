@@ -358,7 +358,7 @@ object AddPolyline : MapMethodHandler {
 
         val temp = options?.applyTo(map)
 
-        if (null != clearLast) {
+        if (clearLast!!) {
             lastPolyline?.remove()
         }
 
