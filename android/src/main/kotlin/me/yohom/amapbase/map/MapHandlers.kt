@@ -20,6 +20,7 @@ import me.yohom.amapbase.common.toFieldJson
 import me.yohom.amapbase.map.marker.MySmoothMarker
 import me.yohom.amapbase.map.marker.SimpleLoc
 import java.io.*
+import java.text.DecimalFormat
 import java.util.*
 
 val beijingLatLng = LatLng(39.941711, 116.382248)
@@ -564,6 +565,49 @@ object SmoothMarker : MapMethodHandler {
         return this
     }
 
+    private fun getLeftTimeStr(time: Int): String {
+        val hour = time / 60 / 60
+        val minute = time / 60 % 60
+        val leftTime: String
+        if (hour > 0) {
+            leftTime = ("预计" +
+                    "<font color='red'><b><tt>" +
+                    hour +
+                    "</tt></b></font>"
+                    + "时" +
+                    "<font color='red'><b><tt>" +
+                    minute +
+                    "</tt></b></font>" +
+                    "分" +
+                    "到达")
+        } else {
+            leftTime = "预计" +
+                    "<font color='red'><b><tt>" +
+                    minute +
+                    "</tt></b></font>" +
+                    "分" +
+                    "到达"
+        }
+        return leftTime
+    }
+
+    private fun getLeftDisStr(dis: Int): String {
+        val km = dis / 1000
+        val leftDis: String
+        leftDis = if (km >= 1) {
+            val disKm = DecimalFormat("#0.0").format(dis.toDouble() / 1000)
+            "距离" +
+                    "<font color='red'><b><tt>" +
+                    disKm + "</tt></b></font>" + "千米"
+        } else {
+            ("距离" +
+                    "<font color='red'><b><tt>" +
+                    dis + "</tt></b></font>"
+                    + "米")
+        }
+        return leftDis
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "marker#setSmoothMarker" -> {
@@ -578,6 +622,10 @@ object SmoothMarker : MapMethodHandler {
             "marker#moveSmoothMarker" -> {
                 val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
                 log("marker#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
+
+                smoothMoveMarker?.getMarker().setTitle(getLeftTimeStr(simpleLoc!!.time))
+                smoothMoveMarker?.getMarker().setSnippet(getLeftDisStr(simpleLoc!!.dis))
+                smoothMoveMarker?.getMarker().showInfoWindow()
 
                 val latLng = LatLng(simpleLoc!!.lat, simpleLoc.lng)
                 smoothMoveMarker?.startMove(latLng, 3000, true)

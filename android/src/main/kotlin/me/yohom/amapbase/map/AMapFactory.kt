@@ -19,6 +19,7 @@ import me.yohom.amapbase.*
 import me.yohom.amapbase.AMapBasePlugin.Companion.registrar
 import me.yohom.amapbase.common.parseFieldJson
 import me.yohom.amapbase.common.toFieldJson
+import me.yohom.amapbase.map.adapter.LeftWindowAdapter
 import java.util.concurrent.atomic.AtomicInteger
 
 const val mapChannelName = "me.yohom/map"
@@ -43,7 +44,7 @@ class AMapFactory(private val activityState: AtomicInteger)
 }
 
 @SuppressLint("CheckResult")
-class AMapView(context: Context,
+class AMapView(private val context: Context,
                private val id: Int,
                private val activityState: AtomicInteger,
                amapOptions: AMapOptions) : PlatformView, Application.ActivityLifecycleCallbacks {
@@ -139,6 +140,8 @@ class AMapView(context: Context,
         mapView.map.setOnMapClickListener {
             clickEventSink?.success(it.toFieldJson())
         }
+
+        mapView.map.setInfoWindowAdapter(LeftWindowAdapter(context))
 
         // 注册生命周期
         registrar.activity().application.registerActivityLifecycleCallbacks(this)

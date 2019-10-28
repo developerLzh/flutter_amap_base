@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/driver_info_pop_2"
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingTop="5dp"
+    android:paddingRight="15dp"
+    android:paddingBottom="15dp">
+
+    <TextView
+        android:id="@+id/left_dis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="距离200公里"
+        android:textColor="#999999"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/left_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:text="预计1小时50分钟到达"
+        android:textColor="#999999"
+        android:textSize="13sp" />
+
+</LinearLayout>
