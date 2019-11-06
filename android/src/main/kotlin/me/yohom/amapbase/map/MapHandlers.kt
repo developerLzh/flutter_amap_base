@@ -486,16 +486,19 @@ object ZoomToSpan : MapMethodHandler {
 
     override fun onMethodCall(methodCall: MethodCall, methodResult: MethodChannel.Result) {
         val boundJson = methodCall.argument<String>("bound") ?: "[]"
-        val padding = methodCall.argument<Int>("padding") ?: 80
+        val paddingLeft = methodCall.argument<Int>("paddingLeft") ?: 80
+        val paddingRight = methodCall.argument<Int>("paddingRight") ?: 80
+        val paddingTop = methodCall.argument<Int>("paddingTop") ?: 80
+        val paddingBottom = methodCall.argument<Int>("paddingBottom") ?: 80
 
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(
+        map.moveCamera(CameraUpdateFactory.newLatLngBoundsRect(
                 LatLngBounds.builder().run {
                     boundJson.parseFieldJson<List<LatLng>>().forEach {
                         include(it)
                     }
                     build()
                 },
-                padding
+                paddingLeft, paddingRight, paddingTop, paddingBottom
         ))
 
         methodResult.success(success)

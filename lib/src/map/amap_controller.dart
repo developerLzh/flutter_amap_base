@@ -185,7 +185,10 @@ class AMapController {
   /// 移动镜头到当前的视角
   Future zoomToSpan(
     List<LatLng> bound, {
-    int padding = 80,
+    int paddingLeft = 80,
+    int paddingRight = 80,
+    int paddingTop = 80,
+    int paddingBottom = 80,
   }) {
     final boundJson =
         jsonEncode(bound?.map((it) => it.toJson())?.toList() ?? List());
@@ -196,7 +199,10 @@ class AMapController {
       'map#zoomToSpan',
       {
         'bound': boundJson,
-        'padding': padding,
+        'paddingLeft': paddingLeft,
+        'paddingRight': paddingRight,
+        'paddingTop': paddingTop,
+        'paddingBottom': paddingBottom,
       },
     );
   }
