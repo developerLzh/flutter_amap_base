@@ -7,7 +7,6 @@
 
 #import "XKMoveAnnotationView.h"
 #import "UIImageView+CarHeading.h"
-#import "XKMoveAnnotation.h"
 
 @interface XKMoveAnnotationView()
 /** 定位img */
