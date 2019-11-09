@@ -19,6 +19,7 @@ import me.yohom.amapbase.common.parseFieldJson
 import me.yohom.amapbase.common.toFieldJson
 import me.yohom.amapbase.map.marker.MySmoothMarker
 import me.yohom.amapbase.map.marker.SimpleLoc
+import me.yohom.amapbase.map.wave.MarkerWave
 import java.io.*
 import java.text.DecimalFormat
 import java.util.*
@@ -679,5 +680,38 @@ object IsInGeoArea : MapMethodHandler {
         polygon.remove()
 
         result.success(contains)
+    }
+}
+
+/**
+ * 带波纹扩散的marker
+ */
+object WaveMarker : MapMethodHandler {
+    lateinit var map: AMap
+    lateinit var markerWave: MarkerWave
+    var marker : Marker? = null
+
+    override fun with(map: AMap): MapMethodHandler {
+        this.map = map
+        markerWave = MarkerWave()
+        return this
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        val methodName = call.method
+        if(methodName == "marker#addWaveMarker"){
+            val optionsJson = call.argument<String>("markerOptions") ?: "{}"
+            val options = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
+            marker = options.applyTo(map)
+
+            val fillColor = call.argument<String>("waveFillColor") ?: "#FF9220"
+            val strokeColor = call.argument<String>("waveStrokeColor") ?: "#FF9220"
+            markerWave.addWaveAnimation(options.position,map,fillColor, strokeColor)
+        } else if(methodName == "marker#removeWaveMarker"){
+            markerWave.removeCircleWave()
+            marker?.remove()
+        }
+
+        result.success(success)
     }
 }

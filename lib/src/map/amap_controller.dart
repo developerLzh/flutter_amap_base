@@ -329,6 +329,25 @@ class AMapController {
     );
   }
 
+  /// 添加带波纹扩散的marker
+  Future addWaveMarker(MarkerOptions options,
+      {fillColor = '#FF9220', strokeColor = '#FF9220'}) {
+    final _optionsJson = options.toJsonString();
+
+    return _mapChannel.invokeMethod('marker#addWaveMarker', {
+      'markerOptions': _optionsJson,
+      'waveFillColor': fillColor,
+      'waveStrokeColor': strokeColor,
+    });
+  }
+
+  /// 移除带波纹扩散的marker
+  Future removeWaveMarker() {
+    return _mapChannel.invokeMethod(
+      'marker#removeWaveMarker',
+    );
+  }
+
   //endregion
 
   /// marker点击事件流
