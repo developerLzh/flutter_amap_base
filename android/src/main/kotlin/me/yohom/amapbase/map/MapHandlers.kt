@@ -684,12 +684,11 @@ object IsInGeoArea : MapMethodHandler {
 }
 
 /**
- * 带波纹扩散的marker
+ * 波纹扩散动画
  */
-object WaveMarker : MapMethodHandler {
+object WaveAnimation : MapMethodHandler {
     lateinit var map: AMap
     lateinit var markerWave: MarkerWave
-    var marker : Marker? = null
 
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
@@ -699,17 +698,15 @@ object WaveMarker : MapMethodHandler {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val methodName = call.method
-        if(methodName == "marker#addWaveMarker"){
-            val optionsJson = call.argument<String>("markerOptions") ?: "{}"
-            val options = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
-            marker = options.applyTo(map)
+        if(methodName == "map#addWaveAnimation"){
+            val optionsJson = call.argument<String>("latlng") ?: "{}"
+            val latlng = optionsJson.parseFieldJson<LatLng>()
 
             val fillColor = call.argument<String>("waveFillColor") ?: "#FF9220"
             val strokeColor = call.argument<String>("waveStrokeColor") ?: "#FF9220"
-            markerWave.addWaveAnimation(options.position,map,fillColor, strokeColor)
-        } else if(methodName == "marker#removeWaveMarker"){
+            markerWave.addWaveAnimation(latlng,map,fillColor, strokeColor)
+        } else if(methodName == "map#removeWaveAnimation"){
             markerWave.removeCircleWave()
-            marker?.remove()
         }
 
         result.success(success)

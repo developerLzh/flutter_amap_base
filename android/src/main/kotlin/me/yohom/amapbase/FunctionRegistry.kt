@@ -39,9 +39,9 @@ val MAP_METHOD_HANDLER: Map<String, MapMethodHandler> = mapOf(
         "marker#setSmoothMarker" to SmoothMarker,
         "marker#moveSmoothMarker" to SmoothMarker,
         "marker#removeSmoothMarker" to SmoothMarker,
-        //带水纹扩散的marker
-        "marker#addWaveMarker" to WaveMarker,
-        "marker#removeWaveMarker" to WaveMarker,
+        //水纹扩散效果
+        "map#addWaveAnimation" to WaveAnimation,
+        "map#removeWaveAnimation" to WaveAnimation,
 
         "map#isInGeoArea" to IsInGeoArea
 )

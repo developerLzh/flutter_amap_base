@@ -329,22 +329,22 @@ class AMapController {
     );
   }
 
-  /// 添加带波纹扩散的marker
-  Future addWaveMarker(MarkerOptions options,
+  /// 添加波纹扩散动画
+  Future addWaveAnimation(LatLng latlng,
       {fillColor = '#FF9220', strokeColor = '#FF9220'}) {
-    final _optionsJson = options.toJsonString();
+    final _optionsJson = latlng.toJsonString();
 
-    return _mapChannel.invokeMethod('marker#addWaveMarker', {
-      'markerOptions': _optionsJson,
+    return _mapChannel.invokeMethod('map#addWaveAnimation', {
+      'latlng': _optionsJson,
       'waveFillColor': fillColor,
       'waveStrokeColor': strokeColor,
     });
   }
 
-  /// 移除带波纹扩散的marker
-  Future removeWaveMarker() {
+  /// 移除波纹扩散动画
+  Future removeWaveAnimation() {
     return _mapChannel.invokeMethod(
-      'marker#removeWaveMarker',
+      'map#removeWaveAnimation',
     );
   }
 
