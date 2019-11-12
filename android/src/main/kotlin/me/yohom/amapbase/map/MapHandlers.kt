@@ -732,11 +732,11 @@ object WaitAcceptMarker : MapMethodHandler {
     private fun initTimer() {
         timer?.cancel()
         timerTask?.cancel()
-        sec = 0
         timer = Timer()
         timerTask = object : TimerTask() {
             override fun run() {
                 sec++
+                log("WaitAcceptAdapter sec-->$sec")
                 val min = sec / 60
                 val sec = sec % 60
                 val minString: String = if (min > 9) {
@@ -787,6 +787,7 @@ object WaitAcceptMarker : MapMethodHandler {
                 timer?.cancel()
                 timerTask?.cancel()
                 marker?.remove()
+                result.success(success)
             }
         }
     }
