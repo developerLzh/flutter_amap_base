@@ -749,9 +749,9 @@ object WaitAcceptMarker : MapMethodHandler {
                 } else {
                     "0$sec"
                 }
-                handler?.post {
+//                handler?.post {
                     marker?.title = "$minString:$secString"
-                }
+//                }
             }
         }
         timer?.schedule(timerTask, 0, 1000)
