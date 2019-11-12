@@ -721,7 +721,7 @@ object WaveAnimation : MapMethodHandler {
 object WaitAcceptMarker : MapMethodHandler {
     lateinit var map: AMap
     lateinit var marker: Marker
-    lateinit var handler:Handler
+    lateinit var handler: Handler
 
     var timer: Timer? = null
     var timerTask: TimerTask? = null
@@ -758,6 +758,7 @@ object WaitAcceptMarker : MapMethodHandler {
 
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
+        this.map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
         handler = Handler()
         return this
     }
@@ -771,8 +772,6 @@ object WaitAcceptMarker : MapMethodHandler {
                 sec = (System.currentTimeMillis() / 1000 - bookTime).toInt()
 
                 marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(AddMarker.map)
-
-                map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
                 marker.isDraggable = false
                 marker.isInfoWindowEnable = true
                 marker.isClickable = false
