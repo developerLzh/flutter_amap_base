@@ -44,7 +44,7 @@ class AMapFactory(private val activityState: AtomicInteger)
 }
 
 @SuppressLint("CheckResult")
-class AMapView(private val context: Context,
+class AMapView(context: Context,
                private val id: Int,
                private val activityState: AtomicInteger,
                amapOptions: AMapOptions) : PlatformView, Application.ActivityLifecycleCallbacks {
@@ -54,6 +54,10 @@ class AMapView(private val context: Context,
     private val registrarActivityHashCode: Int = AMapBasePlugin.registrar.activity().hashCode()
 
     override fun getView(): View = mapView
+
+    companion object {
+        var ctx: Context? = null
+    }
 
     override fun dispose() {
         if (disposed) {
@@ -141,10 +145,10 @@ class AMapView(private val context: Context,
             clickEventSink?.success(it.toFieldJson())
         }
 
-        mapView.map.setInfoWindowAdapter(LeftWindowAdapter(context))
-
         // 注册生命周期
         registrar.activity().application.registerActivityLifecycleCallbacks(this)
+
+        ctx = mapView.context
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

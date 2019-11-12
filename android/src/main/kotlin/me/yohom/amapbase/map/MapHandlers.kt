@@ -17,6 +17,7 @@ import me.yohom.amapbase.MapMethodHandler
 import me.yohom.amapbase.common.log
 import me.yohom.amapbase.common.parseFieldJson
 import me.yohom.amapbase.common.toFieldJson
+import me.yohom.amapbase.map.adapter.LeftWindowAdapter
 import me.yohom.amapbase.map.marker.MySmoothMarker
 import me.yohom.amapbase.map.marker.SimpleLoc
 import me.yohom.amapbase.map.wave.MarkerWave
@@ -566,6 +567,7 @@ object SmoothMarker : MapMethodHandler {
 
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
+        map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
         return this
     }
 
