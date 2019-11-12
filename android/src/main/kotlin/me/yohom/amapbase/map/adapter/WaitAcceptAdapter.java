@@ -39,7 +39,6 @@ public class WaitAcceptAdapter implements AMap.InfoWindowAdapter {
     public View getInfoContents(Marker marker) {
         String title = marker.getTitle();//等待时长
 
-        Log.d("WaitAcceptAdapter", "context == null ? -->" + (context == null));
         View view = LayoutInflater.from(context).inflate(R.layout.zhuanche_wait_accept_info_window, null, false);
 
         TextView wait_accept_time = view.findViewById(R.id.wait_accept_time);
