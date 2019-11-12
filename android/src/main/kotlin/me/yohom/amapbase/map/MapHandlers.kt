@@ -764,8 +764,7 @@ object WaitAcceptMarker : MapMethodHandler {
                     "0$sec"
                 }
                 marker?.title = "$minString:$secString"
-                log("marker == null? ${marker == null}")
-//                log("marker?.title ? $minString:$secString")
+                marker?.showInfoWindow()
             }
             return@Handler true
         }
@@ -784,7 +783,6 @@ object WaitAcceptMarker : MapMethodHandler {
                 marker?.isDraggable = false
                 marker?.isInfoWindowEnable = true
                 marker?.isClickable = false
-                marker?.showInfoWindow()
                 initTimer()
 
                 result.success(success)
