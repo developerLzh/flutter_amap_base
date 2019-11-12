@@ -686,14 +686,16 @@ object SmoothMarker : MapMethodHandler {
                         } else {
                             "0$sec"
                         }
-                        if(this@SmoothMarker.sec == 0){
-                            timer?.cancel()
-                            timerTask?.cancel()
-                        }
+                        
                         val marker = smoothMoveMarker!!.marker
                         marker.isInfoWindowEnable = true
                         marker?.title = "$minString:$secString"
                         marker?.showInfoWindow()
+
+                        if(this@SmoothMarker.sec == 0){
+                            timer?.cancel()
+                            timerTask?.cancel()
+                        }
                     }
                     initTimer()
                     return@Handler true
