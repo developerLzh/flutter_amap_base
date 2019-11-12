@@ -2,6 +2,7 @@ package me.yohom.amapbase.map
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Handler
 import android.util.Log
 import com.amap.api.maps.AMap
 import com.amap.api.maps.AMapUtils
@@ -720,6 +721,7 @@ object WaveAnimation : MapMethodHandler {
 object WaitAcceptMarker : MapMethodHandler {
     lateinit var map: AMap
     lateinit var marker: Marker
+    lateinit var handler:Handler
 
     var timer: Timer? = null
     var timerTask: TimerTask? = null
@@ -746,7 +748,9 @@ object WaitAcceptMarker : MapMethodHandler {
                 } else {
                     "0$sec"
                 }
-                marker.title = "$minString:$secString"
+                handler.post {
+                    marker.title = "$minString:$secString"
+                }
             }
         }
         timer?.schedule(timerTask, 0, 1000)
@@ -754,6 +758,7 @@ object WaitAcceptMarker : MapMethodHandler {
 
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
+        handler = Handler()
         return this
     }
 
@@ -768,7 +773,9 @@ object WaitAcceptMarker : MapMethodHandler {
                 marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(AddMarker.map)
 
                 map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
+                marker.isDraggable = false
                 marker.isInfoWindowEnable = true
+                marker.isClickable = false
                 initTimer()
 
                 result.success(success)
