@@ -695,6 +695,7 @@ object SmoothMarker : MapMethodHandler {
                         marker?.title = "$minString:$secString"
                         marker?.showInfoWindow()
                     }
+                    initTimer()
                     return@Handler true
                 }
                 initTimer()
