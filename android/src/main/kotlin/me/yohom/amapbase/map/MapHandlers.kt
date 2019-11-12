@@ -2,6 +2,7 @@ package me.yohom.amapbase.map
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.util.Log
 import com.amap.api.maps.AMap
 import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
@@ -18,6 +19,7 @@ import me.yohom.amapbase.common.log
 import me.yohom.amapbase.common.parseFieldJson
 import me.yohom.amapbase.common.toFieldJson
 import me.yohom.amapbase.map.adapter.LeftWindowAdapter
+import me.yohom.amapbase.map.adapter.WaitAcceptAdapter
 import me.yohom.amapbase.map.marker.MySmoothMarker
 import me.yohom.amapbase.map.marker.SimpleLoc
 import me.yohom.amapbase.map.wave.MarkerWave
@@ -563,7 +565,7 @@ object AddPolygon : MapMethodHandler {
  */
 object SmoothMarker : MapMethodHandler {
     lateinit var map: AMap
-    var smoothMoveMarker: MySmoothMarker? = null
+    private var smoothMoveMarker: MySmoothMarker? = null
 
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
@@ -700,17 +702,83 @@ object WaveAnimation : MapMethodHandler {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val methodName = call.method
-        if(methodName == "map#addWaveAnimation"){
+        if (methodName == "map#addWaveAnimation") {
             val optionsJson = call.argument<String>("latlng") ?: "{}"
             val latlng = optionsJson.parseFieldJson<LatLng>()
 
             val fillColor = call.argument<String>("waveFillColor") ?: "#FF9220"
             val strokeColor = call.argument<String>("waveStrokeColor") ?: "#FF9220"
-            markerWave.addWaveAnimation(latlng,map,fillColor, strokeColor)
-        } else if(methodName == "map#removeWaveAnimation"){
+            markerWave.addWaveAnimation(latlng, map, fillColor, strokeColor)
+        } else if (methodName == "map#removeWaveAnimation") {
             markerWave.removeCircleWave()
         }
 
         result.success(success)
+    }
+}
+
+object WaitAcceptMarker : MapMethodHandler {
+    lateinit var map: AMap
+    lateinit var marker: Marker
+
+    var timer: Timer? = null
+    var timerTask: TimerTask? = null
+
+    var sec = 0
+
+    private fun initTimer() {
+        timer?.cancel()
+        timerTask?.cancel()
+        sec = 0
+        timer = Timer()
+        timerTask = object : TimerTask() {
+            override fun run() {
+                sec++
+                val min = sec / 60
+                val sec = sec % 60
+                val minString: String = if (min > 9) {
+                    "$min"
+                } else {
+                    "0$min"
+                }
+                val secString: String = if (sec > 9) {
+                    "$sec"
+                } else {
+                    "0$sec"
+                }
+                marker.title = "$minString:$secString"
+            }
+        }
+        timer?.schedule(timerTask, 0, 1000)
+    }
+
+    override fun with(map: AMap): MapMethodHandler {
+        this.map = map
+        return this
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "marker#addWaitAcceptMarker" -> {
+                val optionsJson = call.argument<String>("markerOptions") ?: "{}"
+                val bookTime: Int = call.argument<Int>("bookTime")
+                        ?: (System.currentTimeMillis() / 1000).toInt()
+                sec = (System.currentTimeMillis() / 1000 - bookTime).toInt()
+
+                marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(AddMarker.map)
+
+                map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
+                marker.isInfoWindowEnable = true
+                initTimer()
+
+                result.success(success)
+            }
+            "marker#removeWaitAcceptMarker" -> {
+                sec = 0
+                timer?.cancel()
+                timerTask?.cancel()
+                marker.remove()
+            }
+        }
     }
 }

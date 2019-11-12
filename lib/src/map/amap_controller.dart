@@ -348,6 +348,23 @@ class AMapController {
     );
   }
 
+  /// 添加带倒计时的等待接marker
+  Future addWaitAcceptMarker(MarkerOptions options, int bookTime) {
+    final _optionsJson = options.toJsonString();
+
+    return _mapChannel.invokeMethod('marker#addWaitAcceptMarker', {
+      'markerOptions': _optionsJson,
+      'bookTime': bookTime,
+    });
+  }
+
+  /// 移除带倒计时的等待接marker
+  Future removeWaitAcceptMarker() {
+    return _mapChannel.invokeMethod(
+      'marker#removeWaitAcceptMarker',
+    );
+  }
+
   //endregion
 
   /// marker点击事件流

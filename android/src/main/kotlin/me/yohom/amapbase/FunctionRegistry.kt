@@ -42,8 +42,11 @@ val MAP_METHOD_HANDLER: Map<String, MapMethodHandler> = mapOf(
         //水纹扩散效果
         "map#addWaveAnimation" to WaveAnimation,
         "map#removeWaveAnimation" to WaveAnimation,
-
-        "map#isInGeoArea" to IsInGeoArea
+        //判断是否在区域内
+        "map#isInGeoArea" to IsInGeoArea,
+        //起点等待派单带倒计时infoWindow
+        "marker#addWaitAcceptMarker" to WaitAcceptMarker,
+        "marker#removeWaitAcceptMarker" to WaitAcceptMarker
 )
 
 /**
