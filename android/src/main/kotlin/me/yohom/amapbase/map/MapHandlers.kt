@@ -760,7 +760,7 @@ object WaitAcceptMarker : MapMethodHandler {
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
         this.map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
-        log("AMapView.ctx == null ? ${AMapView.ctx}")
+        log("AMapView.ctx == null ? ${AMapView.ctx == null}")
         handler = Handler()
         return this
     }
@@ -777,6 +777,7 @@ object WaitAcceptMarker : MapMethodHandler {
                 marker?.isDraggable = false
                 marker?.isInfoWindowEnable = true
                 marker?.isClickable = false
+                marker?.showInfoWindow()
                 initTimer()
 
                 result.success(success)
