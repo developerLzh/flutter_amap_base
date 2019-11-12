@@ -720,8 +720,8 @@ object WaveAnimation : MapMethodHandler {
 
 object WaitAcceptMarker : MapMethodHandler {
     lateinit var map: AMap
-    lateinit var handler: Handler
 
+    private var handler: Handler? = null
     private var marker: Marker? = null
 
     var timer: Timer? = null
@@ -749,7 +749,7 @@ object WaitAcceptMarker : MapMethodHandler {
                 } else {
                     "0$sec"
                 }
-                handler.post {
+                handler?.post {
                     marker?.title = "$minString:$secString"
                 }
             }
@@ -772,7 +772,7 @@ object WaitAcceptMarker : MapMethodHandler {
                         ?: (System.currentTimeMillis() / 1000).toInt()
                 sec = (System.currentTimeMillis() / 1000 - bookTime).toInt()
 
-                marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(AddMarker.map)
+                marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(map)
                 marker?.isDraggable = false
                 marker?.isInfoWindowEnable = true
                 marker?.isClickable = false

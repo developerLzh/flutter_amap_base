@@ -2,6 +2,7 @@ package me.yohom.amapbase.map.adapter;
 
 import android.content.Context;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -10,6 +11,9 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.model.Marker;
 
 import me.yohom.amapbase.R;
+import me.yohom.amapbase.common.LogExKt;
+
+import static me.yohom.amapbase.common.LogExKt.log;
 
 /**
  * Created by developerLzh on 2017/12/25 0025.
@@ -35,6 +39,7 @@ public class WaitAcceptAdapter implements AMap.InfoWindowAdapter {
     public View getInfoContents(Marker marker) {
         String title = marker.getTitle();//等待时长
 
+        Log.d("WaitAcceptAdapter", "context == null ? -->" + (context == null));
         View view = LayoutInflater.from(context).inflate(R.layout.zhuanche_wait_accept_info_window, null, false);
 
         TextView wait_accept_time = view.findViewById(R.id.wait_accept_time);
