@@ -3,6 +3,7 @@ package me.yohom.amapbase.map
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.amap.api.maps.AMap
 import com.amap.api.maps.AMapUtils
@@ -737,6 +738,19 @@ object WaitAcceptMarker : MapMethodHandler {
             override fun run() {
                 sec++
                 log("WaitAcceptAdapter sec-->$sec")
+
+                handler?.sendEmptyMessage(0)
+            }
+        }
+        timer?.schedule(timerTask, 0, 1000)
+    }
+
+    override fun with(map: AMap): MapMethodHandler {
+        this.map = map
+        this.map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
+        log("AMapView.ctx == null ? ${AMapView.ctx == null}")
+        handler = Handler{
+            if(it.what == 0){
                 val min = sec / 60
                 val sec = sec % 60
                 val minString: String = if (min > 9) {
@@ -749,19 +763,10 @@ object WaitAcceptMarker : MapMethodHandler {
                 } else {
                     "0$sec"
                 }
-//                handler?.post {
-                    marker?.title = "$minString:$secString"
-//                }
+                marker?.title = "$minString:$secString"
             }
+            return@Handler true
         }
-        timer?.schedule(timerTask, 0, 1000)
-    }
-
-    override fun with(map: AMap): MapMethodHandler {
-        this.map = map
-        this.map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
-        log("AMapView.ctx == null ? ${AMapView.ctx == null}")
-        handler = Handler()
         return this
     }
 
