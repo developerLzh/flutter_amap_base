@@ -658,6 +658,13 @@ object SmoothMarker : MapMethodHandler {
                 smoothMoveMarker = null
             }
             "marker#arriveStartSmoothMarker" -> {
+                val optionsJson = call.argument<String>("markerOptions") ?: "{}"
+                log("marker#setSmoothMarker android端参数: markerOptions -> $optionsJson")
+                val temp = optionsJson.parseFieldJson<UnifiedMarkerOptions>()
+
+                smoothMoveMarker = MySmoothMarker(map, temp.applyTo(map))
+                smoothMoveMarker?.startMove(temp.position, 0, true)
+                log("smoothMarker == null ? ${smoothMoveMarker == null}")
                 //到达起点后的倒计时
                 this.map.setInfoWindowAdapter(ArriveStartWindowAdapter(AMapView.ctx))
                 val arriveTime: Int = call.argument<Int>("arriveTime")

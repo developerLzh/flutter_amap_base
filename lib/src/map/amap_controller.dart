@@ -312,9 +312,14 @@ class AMapController {
   }
 
   /// 到达预约地后倒计时
-  Future arriveStartSmoothMarker(int arriveTime, int bookTime) {
-    return _mapChannel.invokeMethod('marker#arriveStartSmoothMarker',
-        {'arriveTime': arriveTime, 'bookTime': bookTime});
+  Future arriveStartSmoothMarker(
+      MarkerOptions options, int arriveTime, int bookTime) {
+    final _optionsJson = options.toJsonString();
+    return _mapChannel.invokeMethod('marker#arriveStartSmoothMarker', {
+      'markerOptions': _optionsJson,
+      'arriveTime': arriveTime,
+      'bookTime': bookTime
+    });
   }
 
   /// 判断目标点是否在某个面中
