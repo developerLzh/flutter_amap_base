@@ -764,7 +764,8 @@ object WaitAcceptMarker : MapMethodHandler {
                     "0$sec"
                 }
                 marker?.title = "$minString:$secString"
-                log("marker?.title ? $minString:$secString")
+                log("marker == null? ${marker == null}")
+//                log("marker?.title ? $minString:$secString")
             }
             return@Handler true
         }
