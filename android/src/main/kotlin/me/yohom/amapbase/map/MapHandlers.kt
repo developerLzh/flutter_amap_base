@@ -760,6 +760,7 @@ object WaitAcceptMarker : MapMethodHandler {
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
         this.map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
+        log("AMapView.ctx == null ? ${AMapView.ctx}")
         handler = Handler()
         return this
     }
