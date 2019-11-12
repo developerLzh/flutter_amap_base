@@ -20,6 +20,7 @@ import me.yohom.amapbase.MapMethodHandler
 import me.yohom.amapbase.common.log
 import me.yohom.amapbase.common.parseFieldJson
 import me.yohom.amapbase.common.toFieldJson
+import me.yohom.amapbase.map.adapter.ArriveStartWindowAdapter
 import me.yohom.amapbase.map.adapter.LeftWindowAdapter
 import me.yohom.amapbase.map.adapter.WaitAcceptAdapter
 import me.yohom.amapbase.map.marker.MySmoothMarker
@@ -569,9 +570,30 @@ object SmoothMarker : MapMethodHandler {
     lateinit var map: AMap
     private var smoothMoveMarker: MySmoothMarker? = null
 
+    private var handler: Handler? = null
+    var timer: Timer? = null
+    var timerTask: TimerTask? = null
+
+    var sec = 0
+
+    private fun initTimer() {
+        timer?.cancel()
+        timerTask?.cancel()
+        timer = Timer()
+        timerTask = object : TimerTask() {
+            override fun run() {
+                sec--
+                if(sec <= 0){
+                    sec = 0
+                }
+                handler?.sendEmptyMessage(0)
+            }
+        }
+        timer?.schedule(timerTask, 0, 1000)
+    }
+
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
-        this.map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
         return this
     }
 
@@ -580,23 +602,9 @@ object SmoothMarker : MapMethodHandler {
         val minute = time / 60 % 60
         val leftTime: String
         if (hour > 0) {
-            leftTime = ("预计" +
-                    "<font color='red'><b><tt>" +
-                    hour +
-                    "</tt></b></font>"
-                    + "时" +
-                    "<font color='red'><b><tt>" +
-                    minute +
-                    "</tt></b></font>" +
-                    "分" +
-                    "到达")
+            leftTime = "${hour}时${minute}分"
         } else {
-            leftTime = "预计" +
-                    "<font color='red'><b><tt>" +
-                    minute +
-                    "</tt></b></font>" +
-                    "分" +
-                    "到达"
+            leftTime = "${minute}分"
         }
         return leftTime
     }
@@ -606,14 +614,9 @@ object SmoothMarker : MapMethodHandler {
         val leftDis: String
         leftDis = if (km >= 1) {
             val disKm = DecimalFormat("#0.0").format(dis.toDouble() / 1000)
-            "距离" +
-                    "<font color='red'><b><tt>" +
-                    disKm + "</tt></b></font>" + "千米"
+            "${disKm}千米"
         } else {
-            ("距离" +
-                    "<font color='red'><b><tt>" +
-                    dis + "</tt></b></font>"
-                    + "米")
+            "${dis}米"
         }
         return leftDis
     }
@@ -630,6 +633,7 @@ object SmoothMarker : MapMethodHandler {
                 log("smoothMarker == null ? ${smoothMoveMarker == null}")
             }
             "marker#moveSmoothMarker" -> {
+                this.map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
                 val simpleLoc = call.argument<String>("simpleLoc")?.parseFieldJson<SimpleLoc>()
                 log("marker#moveSmoothMarker android端参数: simpleLoc -> ${simpleLoc.toString()}")
 
@@ -652,6 +656,41 @@ object SmoothMarker : MapMethodHandler {
             "marker#removeSmoothMarker" -> {
                 smoothMoveMarker?.destory()
                 smoothMoveMarker = null
+            }
+            "marker#arriveStartSmoothMarker" -> {
+                //到达起点后的倒计时
+                this.map.setInfoWindowAdapter(ArriveStartWindowAdapter(AMapView.ctx))
+                val arriveTime: Int = call.argument<Int>("arriveTime")
+                        ?: ((System.currentTimeMillis() / 1000).toInt())
+                val bookTime: Int = call.argument<Int>("bookTime")
+                        ?: ((System.currentTimeMillis() / 1000).toInt())
+                sec = bookTime - arriveTime
+                handler = Handler {
+                    if (it.what == 0) {
+                        val min = sec / 60
+                        val sec = sec % 60
+                        val minString: String = if (min > 9) {
+                            "$min"
+                        } else {
+                            "0$min"
+                        }
+                        val secString: String = if (sec > 9) {
+                            "$sec"
+                        } else {
+                            "0$sec"
+                        }
+                        if(this@SmoothMarker.sec == 0){
+                            timer?.cancel()
+                            timerTask?.cancel()
+                        }
+                        val marker = smoothMoveMarker!!.marker
+                        marker.isInfoWindowEnable = true
+                        marker?.title = "$minString:$secString"
+                        marker?.showInfoWindow()
+                    }
+                    return@Handler true
+                }
+                initTimer()
             }
         }
 
@@ -737,8 +776,6 @@ object WaitAcceptMarker : MapMethodHandler {
         timerTask = object : TimerTask() {
             override fun run() {
                 sec++
-                log("WaitAcceptAdapter sec-->$sec")
-
                 handler?.sendEmptyMessage(0)
             }
         }

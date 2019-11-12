@@ -311,6 +311,12 @@ class AMapController {
     );
   }
 
+  /// 到达预约地后倒计时
+  Future arriveStartSmoothMarker(int arriveTime, int bookTime) {
+    return _mapChannel.invokeMethod('marker#arriveStartSmoothMarker',
+        {'arriveTime': arriveTime, 'bookTime': bookTime});
+  }
+
   /// 判断目标点是否在某个面中
   Future<bool> isInGeoArea(LatLng target, List<LatLng> area) {
     if (area.length < 3) {

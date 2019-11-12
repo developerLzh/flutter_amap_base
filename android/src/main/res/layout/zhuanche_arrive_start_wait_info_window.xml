@@ -7,30 +7,20 @@
     android:paddingTop="8dp">
 
     <TextView
+        android:id="@+id/count_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textColor="#333333"
+        android:textSize="12sp" />
+
+    <TextView
         android:id="@+id/des"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
-        android:text="距您"
+        android:text="等候倒计时"
         android:textColor="#999999"
         android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/left_dis"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0公里"
-        android:textColor="#333333"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/left_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0分"
-        android:layout_marginLeft="4dp"
-        android:textColor="#333333"
-        android:textSize="12sp" />
-
 
 </LinearLayout>
