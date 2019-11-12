@@ -570,7 +570,7 @@ object SmoothMarker : MapMethodHandler {
 
     override fun with(map: AMap): MapMethodHandler {
         this.map = map
-        map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
+        this.map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
         return this
     }
 
@@ -720,8 +720,9 @@ object WaveAnimation : MapMethodHandler {
 
 object WaitAcceptMarker : MapMethodHandler {
     lateinit var map: AMap
-    lateinit var marker: Marker
     lateinit var handler: Handler
+
+    private var marker: Marker? = null
 
     var timer: Timer? = null
     var timerTask: TimerTask? = null
@@ -749,7 +750,7 @@ object WaitAcceptMarker : MapMethodHandler {
                     "0$sec"
                 }
                 handler.post {
-                    marker.title = "$minString:$secString"
+                    marker?.title = "$minString:$secString"
                 }
             }
         }
@@ -772,9 +773,9 @@ object WaitAcceptMarker : MapMethodHandler {
                 sec = (System.currentTimeMillis() / 1000 - bookTime).toInt()
 
                 marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(AddMarker.map)
-                marker.isDraggable = false
-                marker.isInfoWindowEnable = true
-                marker.isClickable = false
+                marker?.isDraggable = false
+                marker?.isInfoWindowEnable = true
+                marker?.isClickable = false
                 initTimer()
 
                 result.success(success)
@@ -783,7 +784,7 @@ object WaitAcceptMarker : MapMethodHandler {
                 sec = 0
                 timer?.cancel()
                 timerTask?.cancel()
-                marker.remove()
+                marker?.remove()
             }
         }
     }
