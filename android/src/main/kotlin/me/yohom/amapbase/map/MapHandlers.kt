@@ -749,8 +749,8 @@ object WaitAcceptMarker : MapMethodHandler {
         this.map = map
         this.map.setInfoWindowAdapter(WaitAcceptAdapter(AMapView.ctx))
         log("AMapView.ctx == null ? ${AMapView.ctx == null}")
-        handler = Handler{
-            if(it.what == 0){
+        handler = Handler {
+            if (it.what == 0) {
                 val min = sec / 60
                 val sec = sec % 60
                 val minString: String = if (min > 9) {
@@ -764,6 +764,7 @@ object WaitAcceptMarker : MapMethodHandler {
                     "0$sec"
                 }
                 marker?.title = "$minString:$secString"
+                log("marker?.title ? $minString:$secString")
             }
             return@Handler true
         }
