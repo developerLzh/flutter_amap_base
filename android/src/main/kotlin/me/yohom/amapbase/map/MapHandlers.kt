@@ -641,7 +641,7 @@ object SmoothMarker : MapMethodHandler {
                 smoothMoveMarker?.startMove(latLng, 3000, true)
                 val marker = smoothMoveMarker!!.marker
                 if (null != marker) {
-                    marker.rotateAngle = 360.0f - simpleLoc.bearing + map.cameraPosition.bearing
+                    marker.rotateAngle = (360.0f - simpleLoc.bearing + map.cameraPosition.bearing).toFloat()
                     marker.isDraggable = false
                     marker.isInfoWindowEnable = true
                     marker.isClickable = false
