@@ -3,7 +3,7 @@ package me.yohom.amapbase.map.marker;
 public class SimpleLoc {
     public double lat;
     public double lng;
-    public double bearing;
+    public Float bearing;
 
     @Override
     public String toString() {

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 class SimpleLoc {
-  final double lat;
-  final double lng;
-  final double bearing;
+  final num lat;
+  final num lng;
+  final num bearing;
 
   const SimpleLoc(this.lat, this.lng,this.bearing);
 
@@ -18,13 +18,14 @@ class SimpleLoc {
   String toJsonString() => jsonEncode(toJson());
 
   SimpleLoc.fromJson(Map<String, dynamic> json)
-      : lat = json['lat'] as double,
-        lng = json['lng'] as double,
-        bearing = json['bearing'] as double;
+      : lat = json['lat'] as num,
+        lng = json['lng'] as num,
+        bearing = json['bearing'] as num;
 
   SimpleLoc copyWith({
-    double lat,
-    double lng,
+    num lat,
+    num lng,
+    num bearing,
   }) {
     return SimpleLoc(
       lat ?? this.lat,
