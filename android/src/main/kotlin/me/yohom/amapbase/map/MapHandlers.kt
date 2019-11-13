@@ -702,7 +702,7 @@ object SmoothMarker : MapMethodHandler {
                 }
                 initTimer()
             }
-            "marker->countDownSmoothMarker" -> {
+            "marker#countDownSmoothMarker" -> {
                 this.map.setInfoWindowAdapter(ArriveStartWindowAdapter(AMapView.ctx))
                 val leftSec: Int = call.argument<Int>("leftSec") ?: 0
                 val min = leftSec / 60
