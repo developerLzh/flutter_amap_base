@@ -332,7 +332,7 @@ class AMapController {
   /// 平滑移动marker到下一个点
   Future showLeftSmoothMarker(int time, int dis) {
     return _mapChannel.invokeMethod(
-      'marker#moveSmoothMarker',
+      'marker#showLeftSmoothMarker',
       {
         'time': time,
         'dis': dis,
