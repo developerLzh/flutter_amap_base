@@ -329,6 +329,18 @@ class AMapController {
     });
   }
 
+  /// 平滑移动marker到下一个点
+  Future showLeftSmoothMarker(int time, int dis, double bearing) {
+    return _mapChannel.invokeMethod(
+      'marker#moveSmoothMarker',
+      {
+        'time': time,
+        'dis': dis,
+        'bearing': bearing,
+      },
+    );
+  }
+
   /// 判断目标点是否在某个面中
   Future<bool> isInGeoArea(LatLng target, List<LatLng> area) {
     if (area.length < 3) {

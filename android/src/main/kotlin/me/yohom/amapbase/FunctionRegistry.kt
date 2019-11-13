@@ -41,6 +41,7 @@ val MAP_METHOD_HANDLER: Map<String, MapMethodHandler> = mapOf(
         "marker#removeSmoothMarker" to SmoothMarker,
         "marker#arriveStartSmoothMarker" to SmoothMarker,
         "marker#countDownSmoothMarker" to SmoothMarker,
+        "marker#showLeftSmoothMarker" to SmoothMarker,
         //水纹扩散效果
         "map#addWaveAnimation" to WaveAnimation,
         "map#removeWaveAnimation" to WaveAnimation,
