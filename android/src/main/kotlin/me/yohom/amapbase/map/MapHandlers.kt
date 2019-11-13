@@ -639,7 +639,14 @@ object SmoothMarker : MapMethodHandler {
 
                 val latLng = LatLng(simpleLoc!!.lat, simpleLoc.lng)
                 smoothMoveMarker?.startMove(latLng, 3000, true)
-
+                val marker = smoothMoveMarker!!.marker
+                if (null != marker) {
+                    marker.rotateAngle = 360.0f - simpleLoc.bearing + map.cameraPosition.bearing
+                    marker.isDraggable = false
+                    marker.isInfoWindowEnable = true
+                    marker.isClickable = false
+                    marker.setAnchor(0.5f, 0.5f)
+                }
             }
             "marker#removeSmoothMarker" -> {
                 smoothMoveMarker?.destory()
@@ -714,21 +721,12 @@ object SmoothMarker : MapMethodHandler {
             "marker#showLeftSmoothMarker" -> {
                 val dis: Int = call.argument<Int>("dis") ?: 0
                 val time: Int = call.argument<Int>("time") ?: 0
-                val bearing: Double = call.argument<Double>("bearing") ?: 0.0
 
                 this.map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
                 smoothMoveMarker?.getMarker()!!.setTitle(getLeftTimeStr(time))
                 smoothMoveMarker?.getMarker()!!.setSnippet(getLeftDisStr(dis))
                 smoothMoveMarker?.getMarker()!!.showInfoWindow()
 
-                val marker = smoothMoveMarker!!.marker
-                if (null != marker) {
-                    marker.rotateAngle = (360.0f - bearing + map.cameraPosition.bearing).toFloat()
-                    marker.isDraggable = false
-                    marker.isInfoWindowEnable = true
-                    marker.isClickable = false
-                    marker.setAnchor(0.5f, 0.5f)
-                }
             }
         }
 

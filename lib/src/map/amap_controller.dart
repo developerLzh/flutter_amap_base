@@ -330,13 +330,12 @@ class AMapController {
   }
 
   /// 平滑移动marker到下一个点
-  Future showLeftSmoothMarker(int time, int dis, double bearing) {
+  Future showLeftSmoothMarker(int time, int dis) {
     return _mapChannel.invokeMethod(
       'marker#moveSmoothMarker',
       {
         'time': time,
         'dis': dis,
-        'bearing': bearing,
       },
     );
   }
