@@ -322,6 +322,13 @@ class AMapController {
     });
   }
 
+  /// 倒计时infoWindow
+  Future countDownSmoothMarker(int leftSec) {
+    return _mapChannel.invokeMethod('marker#countDownSmoothMarker', {
+      'leftSec': leftSec,
+    });
+  }
+
   /// 判断目标点是否在某个面中
   Future<bool> isInGeoArea(LatLng target, List<LatLng> area) {
     if (area.length < 3) {

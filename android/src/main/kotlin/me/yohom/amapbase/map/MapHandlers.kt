@@ -583,7 +583,7 @@ object SmoothMarker : MapMethodHandler {
         timerTask = object : TimerTask() {
             override fun run() {
                 sec--
-                if(sec <= 0){
+                if (sec <= 0) {
                     sec = 0
                 }
                 handler?.sendEmptyMessage(0)
@@ -686,13 +686,13 @@ object SmoothMarker : MapMethodHandler {
                         } else {
                             "0$sec"
                         }
-                        
+
                         val marker = smoothMoveMarker!!.marker
                         marker.isInfoWindowEnable = true
                         marker?.title = "$minString:$secString"
                         marker?.showInfoWindow()
 
-                        if(this@SmoothMarker.sec == 0){
+                        if (this@SmoothMarker.sec == 0) {
                             timer?.cancel()
                             timerTask?.cancel()
                         }
@@ -701,6 +701,27 @@ object SmoothMarker : MapMethodHandler {
                     return@Handler true
                 }
                 initTimer()
+            }
+            "marker->countDownSmoothMarker" -> {
+                this.map.setInfoWindowAdapter(ArriveStartWindowAdapter(AMapView.ctx))
+                val leftSec: Int = call.argument<Int>("leftSec") ?: 0
+                val min = leftSec / 60
+                val sec = leftSec % 60
+                val minString: String = if (min > 9) {
+                    "$min"
+                } else {
+                    "0$min"
+                }
+                val secString: String = if (sec > 9) {
+                    "$sec"
+                } else {
+                    "0$sec"
+                }
+
+                val marker = smoothMoveMarker!!.marker
+                marker.isInfoWindowEnable = true
+                marker?.title = "$minString:$secString"
+                marker?.showInfoWindow()
             }
         }
 
