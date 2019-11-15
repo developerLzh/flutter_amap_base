@@ -339,6 +339,7 @@ object AddMarkers : MapMethodHandler {
         val clear = call.argument<Boolean>("clear") ?: false
 
         log("方法marker#addMarkers android端参数: optionsListJson -> $optionsListJson")
+        log("方法marker#addMarkers android端参数: moveToCenter -> $moveToCenter")
 
         val optionsList = ArrayList(optionsListJson.parseFieldJson<List<UnifiedMarkerOptions>>().map { it.toMarkerOption() })
         if (clear) map.mapScreenMarkers.forEach { it.remove() }
