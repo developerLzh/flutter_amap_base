@@ -647,6 +647,7 @@ object SmoothMarker : MapMethodHandler {
                 }
             }
             "marker#removeSmoothMarker" -> {
+                smoothMoveMarker?.marker!!.hideInfoWindow()
                 smoothMoveMarker?.destory()
                 smoothMoveMarker = null
             }

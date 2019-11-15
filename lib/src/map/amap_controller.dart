@@ -401,7 +401,7 @@ class AMapController {
     final _optionsJson = options.toJsonString();
     L.p('方法addMarker dart端参数: _optionsJson -> $_optionsJson');
     return _mapChannel.invokeMethod(
-      'marker#addMarker',
+      'marker#addDisTimeMarker',
       {
         'markerOptions': _optionsJson,
         'time': time,
