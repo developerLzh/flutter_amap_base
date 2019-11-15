@@ -362,13 +362,11 @@ object AddPolyline : MapMethodHandler {
 
         log("map#AddPolyline android端参数: options -> $options")
 
-        val temp = options?.applyTo(map)
-
         if (clearLast!!) {
             lastPolyline?.remove()
         }
 
-        lastPolyline = temp
+        lastPolyline = options?.applyTo(map)
 
         result.success(success)
     }
@@ -647,7 +645,7 @@ object SmoothMarker : MapMethodHandler {
                 }
             }
             "marker#removeSmoothMarker" -> {
-                smoothMoveMarker?.marker!!.hideInfoWindow()
+                smoothMoveMarker?.marker?.hideInfoWindow()
                 smoothMoveMarker?.destory()
                 smoothMoveMarker = null
             }
