@@ -3,15 +3,12 @@ package me.yohom.amapbase.map
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import com.amap.api.maps.AMap
 import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.CoordinateConverter
 import com.amap.api.maps.model.*
 import com.amap.api.maps.offlinemap.OfflineMapActivity
-import com.amap.api.maps.utils.overlay.SmoothMoveMarker
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import me.yohom.amapbase.AMapBasePlugin
@@ -21,7 +18,7 @@ import me.yohom.amapbase.common.log
 import me.yohom.amapbase.common.parseFieldJson
 import me.yohom.amapbase.common.toFieldJson
 import me.yohom.amapbase.map.adapter.ArriveStartWindowAdapter
-import me.yohom.amapbase.map.adapter.LeftWindowAdapter
+import me.yohom.amapbase.map.adapter.DisTimeWindowAdapter
 import me.yohom.amapbase.map.adapter.WaitAcceptAdapter
 import me.yohom.amapbase.map.marker.MySmoothMarker
 import me.yohom.amapbase.map.marker.SimpleLoc
@@ -722,8 +719,9 @@ object SmoothMarker : MapMethodHandler {
             "marker#showLeftSmoothMarker" -> {
                 val dis: Int = call.argument<Int>("dis") ?: 0
                 val time: Int = call.argument<Int>("time") ?: 0
+                val des: String = call.argument<String>("des") ?: "剩余"
 
-                this.map.setInfoWindowAdapter(LeftWindowAdapter(AMapView.ctx))
+                this.map.setInfoWindowAdapter(DisTimeWindowAdapter(AMapView.ctx, des))
                 smoothMoveMarker?.getMarker()!!.setTitle(getLeftTimeStr(time))
                 smoothMoveMarker?.getMarker()!!.setSnippet(getLeftDisStr(dis))
                 smoothMoveMarker?.getMarker()!!.showInfoWindow()
@@ -869,5 +867,58 @@ object WaitAcceptMarker : MapMethodHandler {
                 result.success(success)
             }
         }
+    }
+}
+
+object AddDisTimeMarker : MapMethodHandler {
+
+    lateinit var map: AMap
+
+    override fun with(map: AMap): AddDisTimeMarker {
+        this.map = map
+        return this
+    }
+
+    private fun getLeftTimeStr(time: Int): String {
+        val hour = time / 60 / 60
+        val minute = time / 60 % 60
+        val leftTime: String
+        if (hour > 0) {
+            leftTime = "${hour}时${minute}分"
+        } else {
+            leftTime = "${minute}分"
+        }
+        return leftTime
+    }
+
+    private fun getLeftDisStr(dis: Int): String {
+        val km = dis / 1000
+        val leftDis: String
+        leftDis = if (km >= 1) {
+            val disKm = DecimalFormat("#0.0").format(dis.toDouble() / 1000)
+            "${disKm}千米"
+        } else {
+            "${dis}米"
+        }
+        return leftDis
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        val optionsJson = call.argument<String>("markerOptions") ?: "{}"
+
+        log("方法marker#addMarker android端参数: optionsJson -> $optionsJson")
+
+        var marker = optionsJson.parseFieldJson<UnifiedMarkerOptions>().applyTo(map)
+
+        val dis: Int = call.argument<Int>("dis") ?: 0
+        val time: Int = call.argument<Int>("time") ?: 0
+        val des: String = call.argument<String>("des") ?: "剩余"
+
+        this.map.setInfoWindowAdapter(DisTimeWindowAdapter(AMapView.ctx, des))
+        marker.title = getLeftTimeStr(time)
+        marker.snippet = getLeftDisStr(dis)
+        marker.showInfoWindow()
+
+        result.success(success)
     }
 }

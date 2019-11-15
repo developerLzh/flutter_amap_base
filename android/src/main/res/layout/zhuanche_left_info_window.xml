@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="120dp"
+    android:layout_height="37dp"
     android:background="@mipmap/to_start_left_pop"
     android:gravity="center_horizontal"
     android:orientation="horizontal"
-    android:paddingTop="8dp">
+    android:paddingTop="5dp">
 
     <TextView
         android:id="@+id/des"

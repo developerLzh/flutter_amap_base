@@ -330,12 +330,13 @@ class AMapController {
   }
 
   /// 平滑移动marker到下一个点
-  Future showLeftSmoothMarker(int time, int dis) {
+  Future showLeftSmoothMarker(int time, int dis, {String des = '剩余'}) {
     return _mapChannel.invokeMethod(
       'marker#showLeftSmoothMarker',
       {
         'time': time,
         'dis': dis,
+        'des': des,
       },
     );
   }
@@ -391,6 +392,22 @@ class AMapController {
   Future removeWaitAcceptMarker() {
     return _mapChannel.invokeMethod(
       'marker#removeWaitAcceptMarker',
+    );
+  }
+
+  ///添加带时间距离的marker
+  Future addDisTimeMarker(MarkerOptions options, int time, int dis,
+      {String des = '剩余'}) {
+    final _optionsJson = options.toJsonString();
+    L.p('方法addMarker dart端参数: _optionsJson -> $_optionsJson');
+    return _mapChannel.invokeMethod(
+      'marker#addMarker',
+      {
+        'markerOptions': _optionsJson,
+        'time': time,
+        'dis': dis,
+        'des': des,
+      },
     );
   }
 

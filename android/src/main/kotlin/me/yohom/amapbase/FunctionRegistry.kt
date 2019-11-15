@@ -49,8 +49,9 @@ val MAP_METHOD_HANDLER: Map<String, MapMethodHandler> = mapOf(
         "map#isInGeoArea" to IsInGeoArea,
         //起点等待派单带倒计时infoWindow
         "marker#addWaitAcceptMarker" to WaitAcceptMarker,
-        "marker#removeWaitAcceptMarker" to WaitAcceptMarker
-)
+        "marker#removeWaitAcceptMarker" to WaitAcceptMarker,
+        //带剩余时间距离的marker
+        "marker#addDisTimeMarker" to AddDisTimeMarker)
 
 /**
  * 搜索功能集合
