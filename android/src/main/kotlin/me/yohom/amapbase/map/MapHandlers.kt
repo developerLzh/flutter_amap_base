@@ -722,9 +722,9 @@ object SmoothMarker : MapMethodHandler {
                 val des: String = call.argument<String>("des") ?: "剩余"
 
                 this.map.setInfoWindowAdapter(DisTimeWindowAdapter(AMapView.ctx, des))
-                smoothMoveMarker?.getMarker()!!.setTitle(getLeftTimeStr(time))
-                smoothMoveMarker?.getMarker()!!.setSnippet(getLeftDisStr(dis))
-                smoothMoveMarker?.getMarker()!!.showInfoWindow()
+                smoothMoveMarker?.marker!!.title = getLeftTimeStr(time)
+                smoothMoveMarker?.marker!!.snippet = getLeftDisStr(dis)
+                smoothMoveMarker?.marker!!.showInfoWindow()
 
             }
         }
