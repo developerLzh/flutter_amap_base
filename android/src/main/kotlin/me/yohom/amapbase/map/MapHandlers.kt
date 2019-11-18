@@ -360,7 +360,7 @@ object AddPolyline : MapMethodHandler {
         val options = call.argument<String>("options")?.parseFieldJson<UnifiedPolylineOptions>()
         val clearLast = call.argument<Boolean>("clearLast")
 
-        log("map#AddPolyline android端参数: options -> $options")
+        log("map#AddPolyline android端参数:  options -> $options")
 
         if (clearLast!!) {
             lastPolyline?.remove()
