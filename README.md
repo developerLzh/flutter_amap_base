@@ -1,5 +1,16 @@
 # 高德地图Flutter插件 基于AndroidView和UiKitView
+# 原项目地址 https://github.com/OpenFlutter/amap_base_flutter
+## 本项目是在上述项目基础上新增了一些定制化的功能：
+### 1.地图点击事件
+### 2.地图拖拽
+### 3.marker点击事件流
+### 4.带倒计时的等待接marker
+### 5.波纹扩散动画
+### 6.判断目标点是否在某个面中
+### 7.平滑移动marker到下一个点
+### 8.倒计时infoWindow
 
+# 以下是原项目readMe
 |      amap_base     | [![pub package](https://img.shields.io/pub/v/amap_base.svg)](https://pub.Flutter-io.cn/packages/amap_base)                   |
 |:------------------:|:----------------------------------------------------------------------------------------------------------------------------:|
 |    amap_base_map   | [![pub package](https://img.shields.io/pub/v/amap_base_map.svg)](https://pub.Flutter-io.cn/packages/amap_base_map)           |
